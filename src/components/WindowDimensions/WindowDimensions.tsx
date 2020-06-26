@@ -18,7 +18,7 @@ const useWindowDimensions = () => {
 
   useEffect(() => {
     // handle resize function
-    const handleResize = () => {setWindowDimensions(getWindowDimensions()); console.log('resized!');};
+    const handleResize = () => setWindowDimensions(getWindowDimensions());
 
     // on mount, add the event listener, on dismount remove it
     window.addEventListener('resize', handleResize);

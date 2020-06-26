@@ -8,8 +8,6 @@ const vhToPx = (vh: number): number => (vh / 0.16233766233766234);
 
 const App = () => {
   const { width, height } = useWindowDimensions();
-  console.log('width', width);
-  console.log('height', height);
   
   return (
     <div className="App">
