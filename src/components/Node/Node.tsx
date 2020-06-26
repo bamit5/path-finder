@@ -16,18 +16,18 @@ interface NodeProps {
 }
 
 const Node: React.FC<NodeProps> = ({ startingType }: NodeProps /* TODO this shouldn't be needed?... */) => {
+  // parse startingType of node
   if (!startingType) {
-    console.log("YUH");
     startingType = INACTIVE;
   } else if (startingType === true) {
     startingType = ACTIVE;
   }
 
   const [type, setType] = useState<string>(startingType);
+
   return (
     <div
       aria-label="Node"
-      /* draggable={true} */
       onClick={() => setType(type !== INACTIVE ? INACTIVE : ACTIVE)}
       className={type}
     />
