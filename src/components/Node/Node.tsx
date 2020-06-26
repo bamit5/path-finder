@@ -7,15 +7,19 @@ export const buttonTypes = {
   START: 'start-node',
   END: 'end-node',
   BRIDGE: 'bridge-node',
-  WALL: 'wall-node'
-}
-const { ACTIVE, INACTIVE, START, END, BRIDGE} = buttonTypes;
+  WALL: 'wall-node',
+};
+const { ACTIVE, INACTIVE, START, END, BRIDGE } = buttonTypes;
 
 interface NodeProps {
   startingType?: boolean | string;
 }
 
-const Node: React.FC<NodeProps> = ({ startingType }: NodeProps /* TODO this shouldn't be needed?... */) => {
+const Node: React.FC<NodeProps> = (
+  {
+    startingType,
+  }: NodeProps /* TODO this definition shouldn't be needed?... */,
+) => {
   // parse startingType of node
   if (!startingType) {
     startingType = INACTIVE;

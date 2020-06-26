@@ -4,7 +4,7 @@ module.exports = {
     es2020: true,
   },
   extends: [
-    'react-app',
+    //'react-app',
     'airbnb-typescript',
     'prettier/@typescript-eslint',
     'plugin:prettier/recommended',
@@ -24,5 +24,6 @@ module.exports = {
         "warn",
         { vars: "all", varsIgnorePattern: "^_", argsIgnorePattern: "^_" },
     ],
+    'no-plusplus': [2, { allowForLoopAfterthoughts: true }]
   },
 };
