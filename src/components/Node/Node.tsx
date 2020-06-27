@@ -1,39 +1,43 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './Node.scss';
 
-export const buttonTypes = {
-  ACTIVE: 'active-node',
-  INACTIVE: 'inactive-node',
-  START: 'start-node',
-  END: 'end-node',
-  BRIDGE: 'bridge-node',
-  WALL: 'wall-node',
-};
-const { ACTIVE, INACTIVE, START, END, BRIDGE } = buttonTypes;
+import { ENTER, SPACE, nodeTypes } from '../../constants/constants';
+
+const { ACTIVE, INACTIVE, START, END, BRIDGE, VISITED, TAKEN } = nodeTypes;
 
 interface NodeProps {
-  startingType?: boolean | string;
+  _type?: string;
+  visited?: boolean;
+  taken?: boolean;
 }
 
-const Node: React.FC<NodeProps> = (
-  {
-    startingType,
-  }: NodeProps /* TODO this definition shouldn't be needed?... */,
-) => {
-  // parse startingType of node
-  if (!startingType) {
-    startingType = INACTIVE;
-  } else if (startingType === true) {
-    startingType = ACTIVE;
-  }
+const Node: React.FC<NodeProps> = ({
+  _type = INACTIVE,
+  visited = false,
+  taken = false,
+}) => {
+  const [type, setType] = useState<string>(_type);
+  const [style, setStyle] = useState<string>(INACTIVE);
 
-  const [type, setType] = useState<string>(startingType);
+  useEffect(() => {
+    if (taken) setStyle(TAKEN);
+    else if (visited) setStyle(VISITED);
+    else setStyle(type);
+  }, [type, visited, taken]);
 
   return (
     <div
       aria-label="Node"
-      onClick={() => setType(type !== INACTIVE ? INACTIVE : ACTIVE)}
-      className={type}
+      role="button"
+      tabIndex={0}
+      onClick={handleTypeChange}
+      onKeyPress={(e) => {
+        if (e.keyCode === ENTER || e.keyCode === SPACE) {
+          handleTypeChange();
+        }
+      }}
+      className={style}
+      // className={taken ? TAKEN : visited ? VISITED type}
     />
   );
 };

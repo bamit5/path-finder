@@ -1,67 +1,65 @@
 import PQ from 'priorityqueuejs';
+import { NodeData } from '../constants/constants';
 
-interface Node {
-  x: number;
-  y: number;
-  /* visited?: boolean;
-  prev?: Node; */
-}
+type NodeGraph = NodeData[][];
 
-/**
- * Creates a 2d array
- * @param width - the width of the 2D array
- * @param height - the height of the 2D array
- * @param fillWith - what to fill the 2D array with
- */
-function create2DArray<T>(width: number, height: number, fillWith: T): T[][] {
-  // create the 2d array and fill it, then return it
-  const arr2D = new Array(width);
-  for (let i = 0; i < arr2D.length; i++) {
-    arr2D[i] = new Array(height).fill(fillWith);
-  }
-  return arr2D;
-}
+// TODO set 'visited' to true to visualize nodes being visited, and 'partOfPath' to true to visualize a node being selected in a path
+const solve = (graph: NodeGraph, s: NodeData, e: NodeData): NodeGraph => {
+  // deep copy the graph to not change the original
+  graph = { ...graph };
 
-const solve = (graph: Node[][], s: Node, e) => {
-  // create distances array
-  const dist = create2DArray<number>(
-    graph.length,
-    graph[0].length,
-    Number.POSITIVE_INFINITY,
-  );
-  dist[s.x][s.y] = 0;
+  // set start node distance to 0
+  s.dist = 0;
 
-  // create prevs array
-  const prev = create2DArray<null>(graph.length, graph[0].length, null);
   // create min priority queue of distances
-  const pq = new PQ((a, b) => b - a);
+  const pq = new PQ((a: NodeData, b: NodeData) => b.dist - a.dist);
+  pq.enq(s);
 
   while (!pq.isEmpty()) {
-    const cur = pq.deq();
+    // get node with shortest distance in priority queue
+    const cur: NodeData = pq.deq();
 
-    // each node has max of 4 edges: left, right, top, bottom
-    const neighbors: Node[] = [];
-    // Left
-    if (cur.x > 0) neighbors.push(graph[cur.x - 1][cur.y]);
-    // Right
-    if (cur.x < graph.length - 1) neighbors.push(graph[cur.x + 1][cur.y]);
-    // Top
-    if (cur.y > 0) neighbors.push(graph[cur.x][cur.y - 1]);
-    // Bottom
-    if (cur.y < graph[0].length - 1) neighbors.push(graph[cur.x][cur.y + 1]);
+    /* // TODO -- not sure if this will work, test it -- if already visited, continue
+    if (cur.dist) continue; */
+    // mark it as visited
+    cur.visited = true;
+
+    // if destination is cur node, then you've found the shortest path
+    if (cur === e) break;
+
+    // each node has max of 4 neighbors: left, right, top, bottom
+    const neighbors: NodeData[] = [];
+    if (cur.x > 0) neighbors.push(graph[cur.x - 1][cur.y]); // left neighbor
+    if (cur.x < graph.length - 1) neighbors.push(graph[cur.x + 1][cur.y]); // right neighbor
+    if (cur.y > 0) neighbors.push(graph[cur.x][cur.y - 1]); // top neighbor
+    if (cur.y < graph[0].length - 1) neighbors.push(graph[cur.x][cur.y + 1]); // bottom neighbor
 
     neighbors.forEach((n) => {
+      // if there is a shorter path to n through cur, update n's dist/prev and insert n to pq
       if (
-        dist[n.x][n.y] >
-        dist[cur.x][cur.y] + 1 /* TODO the 1 should be the weight of the edge */
+        n.dist >
+        cur.dist + 1 /* TODO the 1 should be the weight of the edge */
       ) {
-        dist[n.x][n.y] =
-          dist[cur.x][cur.y] +
-          1 /* TODO the 1 should be the weight of the edge */;
-        prev[n.x][n.y] = cur;
+        n.dist = cur.dist + 1 /* TODO the 1 should be the weight of the edge */;
+        n.prev = cur;
+        pq.enq(n);
       }
     });
   }
+
+  // didn't find a path!
+  if (!e.prev) {
+    return graph; // TODO throw an error?
+  }
+
+  // starting from the node previous to the end node, mark all the nodes in the shortest path
+  let cur: NodeData = e.prev;
+  while (cur.prev != null) {
+    cur.taken = true;
+    cur = cur.prev;
+  }
+
+  return graph;
 };
 
 export default solve;

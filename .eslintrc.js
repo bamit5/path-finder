@@ -24,6 +24,8 @@ module.exports = {
         "warn",
         { vars: "all", varsIgnorePattern: "^_", argsIgnorePattern: "^_" },
     ],
-    'no-plusplus': [2, { allowForLoopAfterthoughts: true }]
+    'no-plusplus': [2, { allowForLoopAfterthoughts: true }],
+    "no-param-reassign": 0,
+    "no-continue": 0,
   },
 };

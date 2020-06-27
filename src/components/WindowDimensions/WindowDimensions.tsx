@@ -1,20 +1,22 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 // function to return the window dimensions
 const getWindowDimensions = () => {
   const { innerWidth: width, innerHeight: height } = window;
   return {
     width,
-    height
+    height,
   };
-}
+};
 
 /**
  * Usage: will update state whenever window is resized
  *    const { height, width } = useWindowDimensions();
  */
 const useWindowDimensions = () => {
-  const [windowDimensions, setWindowDimensions] = useState(getWindowDimensions());
+  const [windowDimensions, setWindowDimensions] = useState(
+    getWindowDimensions(),
+  );
 
   useEffect(() => {
     // handle resize function
@@ -26,6 +28,6 @@ const useWindowDimensions = () => {
   }, []);
 
   return windowDimensions;
-}
+};
 
 export default useWindowDimensions;
