@@ -3,7 +3,7 @@ import './Node.scss';
 
 import { ENTER, SPACE, nodeTypes } from '../../constants/constants';
 
-const { ACTIVE, INACTIVE, START, END, BRIDGE, VISITED, TAKEN } = nodeTypes;
+const { INACTIVE, WALL, START, END, BRIDGE, VISITED, TAKEN } = nodeTypes;
 
 interface NodeProps {
   _type?: string;
@@ -30,14 +30,15 @@ const Node: React.FC<NodeProps> = ({
       aria-label="Node"
       role="button"
       tabIndex={0}
-      onClick={handleTypeChange}
+      onClick={() => setType(type !== INACTIVE ? INACTIVE : WALL)} // TODO add functionality for other types too
       onKeyPress={(e) => {
-        if (e.keyCode === ENTER || e.keyCode === SPACE) {
-          handleTypeChange();
+        console.log(e.key);
+        if (e.key === ENTER || e.key === SPACE) {
+          // TODO add functionality for other types too
+          setType(type !== INACTIVE ? INACTIVE : WALL);
         }
       }}
       className={style}
-      // className={taken ? TAKEN : visited ? VISITED type}
     />
   );
 };

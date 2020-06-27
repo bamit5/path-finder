@@ -33,7 +33,7 @@ const Graph: React.FC<GraphProps> = ({ width, height }: GraphProps) => {
           {rowOfNodes.map((nodeData: NodeData) => (
             // create a node for each index in the 2d array
             <Node
-              type={nodeData.type}
+              _type={nodeData.type}
               visited={nodeData.visited}
               taken={nodeData.taken}
             />

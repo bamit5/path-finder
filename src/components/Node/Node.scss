@@ -19,7 +19,12 @@ $node-spacing: 0.15vh;
   }
 }
 
-.active-node {
+.inactive-node {
+  @extend .node;
+  background-color: $node-color;
+}
+
+.wall-node {
   @extend .node;
   $node-color: aquamarine;
   background-color: $node-color;
@@ -27,9 +32,4 @@ $node-spacing: 0.15vh;
   &:hover {
     background-color: darken($node-color, $color-emphasis);
   }
-}
-
-.inactive-node {
-  @extend .node;
-  background-color: $node-color;
 }

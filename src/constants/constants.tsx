@@ -1,8 +1,8 @@
 export const pxToVh = (px: number): number => px * 0.16233766233766234;
 export const vhToPx = (vh: number): number => vh / 0.16233766233766234;
 
-export const ENTER = 13;
-export const SPACE = 32;
+export const ENTER = 'Enter';
+export const SPACE = ' ';
 
 export interface NodeData {
   x: number;
@@ -15,7 +15,6 @@ export interface NodeData {
 }
 
 export const nodeTypes = {
-  ACTIVE: 'active-node', // TODO delete ACTIVE, cause 'active' = 'wall' node
   INACTIVE: 'inactive-node',
   WALL: 'wall-node',
   START: 'start-node',
