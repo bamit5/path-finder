@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { connect } from 'react-redux';
 import Node from '../Node/Node';
 import './Graph.scss';
 import { NodeData, defaultNode } from '../../constants/constants';
@@ -44,4 +45,4 @@ const Graph: React.FC<GraphProps> = ({ width, height }: GraphProps) => {
   );
 };
 
-export default Graph;
+export default connect()(Graph);
