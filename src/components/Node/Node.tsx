@@ -1,50 +1,81 @@
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
+// TODO
+// eslint-disable-next-line sort-imports
 import './Node.scss';
-import { ENTER, SPACE, nodeTypes } from '../../constants/constants';
+import { ENTER, SPACE, nodeStyles } from '../../constants/constants';
+// TODO
+// eslint-disable-next-line import/named
+import { ModeType, Modes, NodeType, Nodes } from '../../redux/constants';
 import { RootState } from '../../redux/reducers';
-import { ModeType, NodeType } from '../../redux/constants';
-
-const { INACTIVE, WALL, START, END, BRIDGE, VISITED, TAKEN } = nodeTypes;
 
 interface NodeProps {
-  _type?: string;
+  _style?: string;
   visited?: boolean;
   taken?: boolean;
 }
 
 interface StateProps {
   mode: ModeType;
-  nodeType: NodeType;
+  settingNodeType: NodeType;
 }
 
 const Node: React.FC<NodeProps & StateProps> = ({
-  _type = INACTIVE,
+  _style = nodeStyles.INACTIVE,
   visited = false,
   taken = false,
   mode,
-  nodeType,
+  settingNodeType,
 }) => {
-  const [type, setType] = useState<string>(_type);
-  const [style, setStyle] = useState<string>(INACTIVE);
+  const [style, setStyle] = useState<string>(_style);
 
   useEffect(() => {
-    if (taken) setStyle(TAKEN);
-    else if (visited) setStyle(VISITED);
-    else setStyle(type);
-  }, [type, visited, taken]);
+    if (taken) setStyle(nodeStyles.TAKEN);
+    else if (visited) setStyle(nodeStyles.VISITED);
+    else setStyle(_style);
+  }, [_style, visited, taken]);
+
+  const updateStyle = () => {
+    // only update style if the node is not taken, not visited, and the mode allows for user changes
+    if (!taken && !visited && mode === Modes.EDITING) {
+      if (style !== nodeStyles.INACTIVE) {
+        // toggle inactive
+        setStyle(nodeStyles.INACTIVE);
+      } else {
+        // find correct node type to set
+        switch (settingNodeType) {
+          case Nodes.SETTING_WALL_NODES:
+            setStyle(nodeStyles.WALL);
+            break;
+
+          case Nodes.SETTING_START_NODE:
+            setStyle(nodeStyles.START);
+            break;
+
+          case Nodes.SETTING_END_NODE:
+            setStyle(nodeStyles.END);
+            break;
+
+          case Nodes.SETTING_BRIDGE_NODES:
+            setStyle(nodeStyles.BRIDGE);
+            break;
+
+          default:
+          // TODO
+        }
+      }
+    }
+  };
 
   return (
     <div
       aria-label="Node"
       role="button"
       tabIndex={0}
-      onClick={() => setType(type !== INACTIVE ? INACTIVE : WALL)} // TODO add functionality for other types too
+      onClick={updateStyle}
       onKeyPress={(e) => {
-        console.log(e.key);
         if (e.key === ENTER || e.key === SPACE) {
-          // TODO add functionality for other types too
-          setType(type !== INACTIVE ? INACTIVE : WALL);
+          updateStyle();
         }
       }}
       className={style}
@@ -54,7 +85,7 @@ const Node: React.FC<NodeProps & StateProps> = ({
 
 const mapStateToProps = (state: RootState): StateProps => ({
   mode: state.mode.mode,
-  nodeType: state.mode.nodeType,
+  settingNodeType: state.mode.settingNodeType,
 });
 
 export default connect(mapStateToProps)(Node);

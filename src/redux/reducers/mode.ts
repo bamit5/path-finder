@@ -6,13 +6,13 @@ import { Algorithms } from '../../constants/constants';
 
 export interface ModeState {
   mode: ModeType;
-  nodeType: NodeType;
+  settingNodeType: NodeType;
   solvingAlg: string; // TODO change this to function type?
 }
 
 const initialState: ModeState = {
   mode: ModeConstants.EDITING,
-  nodeType: ModeConstants.SETTING_WALL_NODES,
+  settingNodeType: ModeConstants.SETTING_WALL_NODES,
   solvingAlg: Algorithms.DIJKSTRAS,
 };
 
@@ -52,25 +52,25 @@ const mode = (state = initialState, action: AnyAction) => {
     case ModeConstants.SETTING_WALL_NODES:
       return {
         ...state,
-        nodeType: ModeConstants.SETTING_WALL_NODES,
+        settingNodeType: ModeConstants.SETTING_WALL_NODES,
       };
 
     case ModeConstants.SETTING_START_NODE:
       return {
         ...state,
-        nodeType: ModeConstants.SETTING_START_NODE,
+        settingNodeType: ModeConstants.SETTING_START_NODE,
       };
 
     case ModeConstants.SETTING_END_NODE:
       return {
         ...state,
-        nodeType: ModeConstants.SETTING_END_NODE,
+        settingNodeType: ModeConstants.SETTING_END_NODE,
       };
 
     case ModeConstants.SETTING_BRIDGE_NODES:
       return {
         ...state,
-        nodeType: ModeConstants.SETTING_BRIDGE_NODES,
+        settingNodeType: ModeConstants.SETTING_BRIDGE_NODES,
       };
 
     default:

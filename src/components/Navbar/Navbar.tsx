@@ -1,25 +1,55 @@
-import React from 'react';
 import './Navbar.scss';
-import Button from 'react-bootstrap/Button';
-import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
-import NavDropdown from 'react-bootstrap/NavDropdown';
+import Navbar from 'react-bootstrap/Navbar';
+import React from 'react';
+import { connect } from 'react-redux';
+import { Dispatch } from 'redux';
+// TODO
+import { ModeType } from '../../redux/constants';
+// TODO
+// eslint-disable-next-line sort-imports
+import { RootState } from '../../redux/reducers';
+import modeActions from '../../redux/actions/mode';
 
-const CustomNavbar = () => (
+interface StateProps {
+  mode: ModeType;
+}
+
+interface DispatchProps {
+  settingStartNode: () => void;
+  settingEndNode: () => void;
+  settingWallNodes: () => void;
+  settingBridgeNodes: () => void;
+}
+
+const CustomNavbar: React.FC<StateProps & DispatchProps> = ({
+  mode,
+  settingStartNode,
+  settingEndNode,
+  settingWallNodes,
+  settingBridgeNodes,
+}) => (
   <Navbar collapseOnSelect bg="dark" variant="dark" expand="md">
     <Navbar.Brand>Path Finder</Navbar.Brand>
-    <Navbar.Toggle aria-controls="basic-nav-bar"/>
+    <Navbar.Toggle aria-controls="basic-nav-bar" />
     <Navbar.Collapse className="justify-content-end">
       <Nav className="controls">
-        <button>Start Point</button>
-        <button>End Point</button>
-        <button>Build Walls</button>
-        <button>Build Bridges</button>
-        <button>Drop Bombs</button>
+        <button type="button" onClick={() => settingStartNode()}>
+          Start Point
+        </button>
+        <button type="button" onClick={() => settingEndNode()}>
+          End Point
+        </button>
+        <button type="button" onClick={() => settingWallNodes()}>
+          Build Walls
+        </button>
+        <button type="button" onClick={() => settingBridgeNodes()}>
+          Build Bridges
+        </button>
       </Nav>
     </Navbar.Collapse>
   </Navbar>
-)
+);
 
 /* TODO
 const Navbar = () => (
@@ -32,7 +62,7 @@ const Navbar = () => (
       </button>
     </div>
   </div>
-)*/
+) */
 
 /*
         <NavDropdown title="test 0" id="navbarDropdownTest">
@@ -55,4 +85,15 @@ const Navbar = () => (
         </NavDropdown>
         */
 
-export default CustomNavbar;
+const mapStateToProps = (state: RootState): StateProps => ({
+  mode: state.mode.mode,
+});
+
+const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => ({
+  settingStartNode: () => dispatch(modeActions.settingStartNode()),
+  settingEndNode: () => dispatch(modeActions.settingEndNode()),
+  settingWallNodes: () => dispatch(modeActions.settingWallNodes()),
+  settingBridgeNodes: () => dispatch(modeActions.settingBridgeNodes()),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(CustomNavbar);

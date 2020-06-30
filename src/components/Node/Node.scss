@@ -26,7 +26,37 @@ $node-spacing: 0.15vh;
 
 .wall-node {
   @extend .node;
+  $node-color: black;
+  background-color: $node-color;
+
+  &:hover {
+    background-color: darken($node-color, $color-emphasis);
+  }
+}
+
+.start-node {
+  @extend .node;
   $node-color: aquamarine;
+  background-color: $node-color;
+
+  &:hover {
+    background-color: darken($node-color, $color-emphasis);
+  }
+}
+
+.end-node {
+  @extend .node;
+  $node-color: aqua;
+  background-color: $node-color;
+
+  &:hover {
+    background-color: darken($node-color, $color-emphasis);
+  }
+}
+
+.bridge-node {
+  @extend .node;
+  $node-color: green;
   background-color: $node-color;
 
   &:hover {

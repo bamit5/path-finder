@@ -1,5 +1,6 @@
 import React from 'react';
 import './App.scss';
+import { connect } from 'react-redux';
 import Graph from './components/Graph/Graph';
 import useWindowDimensions from './components/WindowDimensions/WindowDimensions';
 import Navbar from './components/Navbar/Navbar';
@@ -21,4 +22,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default connect()(App);

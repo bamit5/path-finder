@@ -14,7 +14,7 @@ export interface NodeData {
   taken: boolean;
 }
 
-export const nodeTypes = {
+export const nodeStyles = {
   INACTIVE: 'inactive-node',
   WALL: 'wall-node',
   START: 'start-node',
@@ -29,7 +29,7 @@ export const defaultNode: NodeData = {
   y: 0,
   dist: Number.POSITIVE_INFINITY,
   prev: null,
-  type: nodeTypes.INACTIVE,
+  type: nodeStyles.INACTIVE,
   visited: false,
   taken: false,
 };
