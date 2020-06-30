@@ -19,12 +19,6 @@ enum SolvingAlgorithms {
   DIJKSTRAS = ModeConstants.DIJKSTRAS,
   A_STAR = ModeConstants.A_STAR,
 }
-// TODO
-// const SolvingAlgorithms = {
-//   BFS: ModeConstants.BFS,
-//   DIJKSTRAS: ModeConstants.DIJKSTRAS,
-//   A_STAR: ModeConstants.A_STAR,
-// } as const;
 
 enum Modes {
   EDITING = ModeConstants.EDITING,
@@ -32,13 +26,6 @@ enum Modes {
   SOLVED_SUCCESS = ModeConstants.SOLVED_SUCCESS,
   SOLVED_FAILURE = ModeConstants.SOLVED_FAILURE,
 }
-// TODO
-// const Modes = {
-//   EDITING: ModeConstants.EDITING,
-//   SOLVING: ModeConstants.SOLVING,
-//   SOLVED_SUCCESS: ModeConstants.SOLVED_SUCCESS,
-//   SOLVED_FAILURE: ModeConstants.SOLVED_FAILURE,
-// } as const;
 
 enum Nodes {
   SETTING_WALL_NODES = ModeConstants.SETTING_WALL_NODES,
@@ -46,13 +33,6 @@ enum Nodes {
   SETTING_END_NODE = ModeConstants.SETTING_END_NODE,
   SETTING_BRIDGE_NODES = ModeConstants.SETTING_BRIDGE_NODES,
 }
-// TODO
-// const Nodes = {
-//   SETTING_WALL_NODES: ModeConstants.SETTING_WALL_NODES,
-//   SETTING_START_NODE: ModeConstants.SETTING_START_NODE,
-//   SETTING_END_NODE: ModeConstants.SETTING_END_NODE,
-//   SETTING_BRIDGE_NODES: ModeConstants.SETTING_BRIDGE_NODES,
-// } as const;
 
 type Mode =
   | ModeConstants.EDITING
