@@ -14,26 +14,6 @@ enum ModeConstants {
   SETTING_BRIDGE_NODES = 'bridge-node',
 }
 
-enum SolvingAlgorithms {
-  BFS = ModeConstants.BFS,
-  DIJKSTRAS = ModeConstants.DIJKSTRAS,
-  A_STAR = ModeConstants.A_STAR,
-}
-
-enum Modes {
-  EDITING = ModeConstants.EDITING,
-  SOLVING = ModeConstants.SOLVING,
-  SOLVED_SUCCESS = ModeConstants.SOLVED_SUCCESS,
-  SOLVED_FAILURE = ModeConstants.SOLVED_FAILURE,
-}
-
-enum Nodes {
-  SETTING_WALL_NODES = ModeConstants.SETTING_WALL_NODES,
-  SETTING_START_NODE = ModeConstants.SETTING_START_NODE,
-  SETTING_END_NODE = ModeConstants.SETTING_END_NODE,
-  SETTING_BRIDGE_NODES = ModeConstants.SETTING_BRIDGE_NODES,
-}
-
 type Mode =
   | ModeConstants.EDITING
   | ModeConstants.SOLVING
@@ -51,7 +31,7 @@ type SolvingAlgorithm =
   | ModeConstants.DIJKSTRAS
   | ModeConstants.A_STAR;
 
-export { ModeConstants, Modes, Nodes, SolvingAlgorithms };
+export { ModeConstants };
 export type ModeType = Mode;
 export type NodeType = Node;
 export type SolvingAlgorithmType = SolvingAlgorithm;

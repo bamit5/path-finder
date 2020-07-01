@@ -1,3 +1,5 @@
+import { List } from 'immutable';
+
 export const pxToVh = (px: number): number => px * 0.16233766233766234;
 export const vhToPx = (vh: number): number => vh / 0.16233766233766234;
 
@@ -13,6 +15,13 @@ export interface NodeData {
   visited: boolean;
   taken: boolean;
 }
+
+export interface Point {
+  x: number;
+  y: number;
+}
+
+export type Graph = List<List<NodeData>>;
 
 export const nodeStyles = {
   INACTIVE: 'inactive-node',

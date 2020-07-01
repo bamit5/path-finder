@@ -1,13 +1,23 @@
+import { List } from 'immutable';
 import { AnyAction } from 'redux';
 import { GraphConstants } from '../constants';
-import { NodeData } from '../../constants/constants';
+import { Graph, Point, defaultNode, NodeData } from '../../constants/constants';
 
 export interface GraphState {
-  startNode: NodeData | null;
-  endNode: NodeData | null;
+  graph: Graph;
+  startNode: Point | null;
+  endNode: Point | null;
 }
 
+const initGraph = (width: number, height: number): Graph => {
+  const init = List<List<NodeData>>(
+    Array(width).fill(Array(height).fill(defaultNode)),
+  );
+  return init;
+};
+
 const initialState: GraphState = {
+  graph: initGraph(0, 0),
   startNode: null,
   endNode: null,
 };
@@ -20,23 +30,40 @@ const graph = (state = initialState, action: AnyAction) => {
         startNode: action.message,
       };
 
-    case GraphConstants.RESET_START_NODE:
-      return {
-        ...state,
-        startNode: null,
-      };
-
     case GraphConstants.SET_END_NODE:
       return {
         ...state,
         endNode: action.message,
       };
 
-    case GraphConstants.RESET_END_NODE:
+    case GraphConstants.INIT_GRAPH: {
+      const { width, height } = action.message;
       return {
         ...state,
-        endNode: null,
+        graph: initGraph(width, height),
       };
+    }
+
+    case GraphConstants.CHANGE_NODE: {
+      const change: NodeData = action.message;
+      return {
+        ...state,
+        graph: state.graph.updateIn(
+          [change.x, change.y],
+          (original): NodeData => ({
+            // can't change
+            x: original.x,
+            y: original.y,
+            dist: original.dist,
+            prev: original.prev,
+            // can change
+            type: change.type ? change.type : original.type,
+            visited: change.visited ? change.visited : original.visited,
+            taken: change.taken ? change.taken : original.taken,
+          }),
+        ),
+      };
+    }
 
     default:
       return state;
