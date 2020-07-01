@@ -16,6 +16,10 @@ export interface NodeData {
   taken: boolean;
 }
 
+// creates an interface in which dist, prev, type, visited, and taken are optional, and x and y are required
+export type ChangeableNodeData = Partial<Omit<NodeData, 'x' | 'y'>> &
+  Required<Pick<NodeData, 'x' | 'y'>>;
+
 export interface Point {
   x: number;
   y: number;

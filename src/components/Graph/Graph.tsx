@@ -2,7 +2,11 @@ import React, { Dispatch, useEffect } from 'react';
 import { connect } from 'react-redux';
 import Node from '../Node/Node';
 import './Graph.scss';
-import { Graph as GraphType } from '../../constants/constants';
+import {
+  ChangeableNodeData,
+  Graph as GraphType,
+  nodeStyles,
+} from '../../constants/constants';
 import { RootState } from '../../redux/reducers';
 import graphActions from '../../redux/actions/graph';
 
@@ -17,6 +21,7 @@ interface StateProps {
 
 interface DispatchProps {
   initGraph: (width: number, height: number) => void;
+  changeNode: (change: ChangeableNodeData) => void;
 }
 
 const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
@@ -24,12 +29,12 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
   height,
   graph,
   initGraph,
+  changeNode,
 }) => {
   useEffect(() => {
     // create initial graph
-    // const init = Array(width).fill(Array(height).fill(defaultNode));
-    // setGraph(init);
     initGraph(width, height);
+    setTimeout(() => changeNode({ x: 0, y: 0, type: nodeStyles.BRIDGE }), 1000); // TODO
   }, [width, height]);
 
   return (
@@ -38,7 +43,12 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
         <div>
           {row.map((node, y) => (
             // create a node for each index in the 2d array
-            <Node point={{ x, y }} visited={node.visited} taken={node.taken} />
+            <Node
+              point={{ x, y }}
+              type={node.type}
+              visited={node.visited}
+              taken={node.taken}
+            />
           ))}
         </div>
       ))}
@@ -52,6 +62,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
 
 const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => ({
   initGraph: (width, height) => dispatch(graphActions.initGraph(width, height)),
+  changeNode: (change) => dispatch(graphActions.changeNode(change)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Graph);

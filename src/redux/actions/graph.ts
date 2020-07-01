@@ -1,4 +1,4 @@
-import { NodeData, Point } from '../../constants/constants';
+import { ChangeableNodeData, Point } from '../../constants/constants';
 import { GraphConstants } from '../constants';
 
 const setStartNode = (startNode: Point | null) => ({
@@ -16,10 +16,8 @@ const initGraph = (width: number, height: number) => ({
   message: { width, height },
 });
 
-// can only change type, visited, and taken properties
-const changeNode = (
-  node: Partial<Omit<NodeData, 'x' | 'y' | 'dist' | 'prev'>>,
-) => ({
+// can only change type, visited, and taken properties. need x and y to find the node
+const changeNode = (node: ChangeableNodeData) => ({
   type: GraphConstants.CHANGE_NODE,
   message: node,
 });

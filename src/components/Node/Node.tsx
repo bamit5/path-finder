@@ -5,7 +5,13 @@ import { connect } from 'react-redux';
 import './Node.scss';
 import _ from 'underscore';
 import graphActions from '../../redux/actions/graph';
-import { ENTER, Point, SPACE, nodeStyles } from '../../constants/constants';
+import {
+  ChangeableNodeData,
+  ENTER,
+  Point,
+  SPACE,
+  nodeStyles,
+} from '../../constants/constants';
 // TODO
 // eslint-disable-next-line import/named
 import { ModeConstants, ModeType, NodeType } from '../../redux/constants';
@@ -13,6 +19,7 @@ import { RootState } from '../../redux/reducers';
 
 interface NodeProps {
   point: Point;
+  type: string;
   visited: boolean;
   taken: boolean;
 }
@@ -27,10 +34,12 @@ interface StateProps {
 interface DispatchProps {
   setStartNode: (startNode: Point | null) => void;
   setEndNode: (endNode: Point | null) => void;
+  changeNode: (change: ChangeableNodeData) => void;
 }
 
 const Node: React.FC<NodeProps & StateProps & DispatchProps> = ({
   point,
+  type,
   visited,
   taken,
   mode,
@@ -39,53 +48,55 @@ const Node: React.FC<NodeProps & StateProps & DispatchProps> = ({
   endNode,
   setStartNode,
   setEndNode,
+  changeNode,
 }) => {
-  const [style, setStyle] = useState<string>(nodeStyles.INACTIVE); // TODO useReducer?
+  const [style, setStyle] = useState<string>(type);
+  const setType = (_type: string) =>
+    changeNode({ x: point.x, y: point.y, type: _type });
 
   useEffect(() => {
     if (taken) setStyle(nodeStyles.TAKEN);
     else if (visited) setStyle(nodeStyles.VISITED);
-    else setStyle(style);
-  }, [style, visited, taken]);
+    else setStyle(type);
+  }, [visited, taken, type]);
 
   const handleClick = () => {
-    console.log('handling click');
     // only update style if the mode allows for user changes
-    if (/* TODO !taken && !visited && */ mode === ModeConstants.EDITING) {
-      console.log('mode = editing');
+    if (mode === ModeConstants.EDITING) {
       // check if should remove this node from any of the redux states
-      if (_.isEqual(point, startNode)) {
-        setStartNode(null);
-        console.log('clicked node was the start node (but no longer!)'); // TODO remove console logs eventually
-      }
-      if (_.isEqual(point, endNode)) {
-        setEndNode(null);
-        console.log('clicked node was the end node (but no longer!)');
-      }
+      if (_.isEqual(point, startNode)) setStartNode(null);
+      if (_.isEqual(point, endNode)) setEndNode(null);
       // TODO if (bridgeNodes.includes(ref)) /* TODO change this to be in redux */bridgeNodes.remove(ref)
 
       if (style !== nodeStyles.INACTIVE) {
-        console.log('setting the style of clicked node to INACTIVE');
         // toggle inactive
-        setStyle(nodeStyles.INACTIVE);
+        setType(nodeStyles.INACTIVE);
       } else {
         // eslint-disable-next-line default-case
         switch (settingNodeType) {
           case ModeConstants.SETTING_START_NODE:
-            // reset previous start node's style (if it exists), and set this node to current start node
+            // reset previous start node's style (if it exists)
             if (startNode) {
-              // TODO startNode.setStyle(nodeStyles.INACTIVE);
-              console.log(
-                'previous start nodes style is being set to INACTIVE',
-              );
+              changeNode({
+                x: startNode.x,
+                y: startNode.y,
+                type: nodeStyles.INACTIVE,
+              });
             }
-            console.log('clicked node is being set to start node!');
+            // set this node to start node
             setStartNode(point);
             break;
 
           case ModeConstants.SETTING_END_NODE:
-            // reset previous end node's style (if it exists), and set this node to current end node
-            // TODO if (endNode) endNode.setStyle(nodeStyles.INACTIVE);
+            // reset previous end node's style (if it exists)
+            if (endNode) {
+              changeNode({
+                x: endNode.x,
+                y: endNode.y,
+                type: nodeStyles.INACTIVE,
+              });
+            }
+            // set this node to end node
             setEndNode(point);
             break;
 
@@ -93,8 +104,8 @@ const Node: React.FC<NodeProps & StateProps & DispatchProps> = ({
             // TODO
             break;
         }
-        // always set the style to settingNodeType
-        setStyle(settingNodeType);
+        // always set the type to settingNodeType
+        setType(settingNodeType);
       }
     }
   };
@@ -125,6 +136,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
 const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => ({
   setStartNode: (startNode) => dispatch(graphActions.setStartNode(startNode)),
   setEndNode: (endNode) => dispatch(graphActions.setEndNode(endNode)),
+  changeNode: (change) => dispatch(graphActions.changeNode(change)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Node);

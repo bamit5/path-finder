@@ -1,7 +1,13 @@
 import { List } from 'immutable';
 import { AnyAction } from 'redux';
 import { GraphConstants } from '../constants';
-import { Graph, Point, defaultNode, NodeData } from '../../constants/constants';
+import {
+  ChangeableNodeData,
+  Graph,
+  NodeData,
+  Point,
+  defaultNode,
+} from '../../constants/constants';
 
 export interface GraphState {
   graph: Graph;
@@ -45,7 +51,7 @@ const graph = (state = initialState, action: AnyAction) => {
     }
 
     case GraphConstants.CHANGE_NODE: {
-      const change: NodeData = action.message;
+      const change: ChangeableNodeData = action.message;
       return {
         ...state,
         graph: state.graph.updateIn(
