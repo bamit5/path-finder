@@ -5,7 +5,6 @@ import './Graph.scss';
 import {
   ChangeableNodeData,
   Graph as GraphType,
-  nodeStyles,
 } from '../../constants/constants';
 import { RootState } from '../../redux/reducers';
 import graphActions from '../../redux/actions/graph';
@@ -34,7 +33,6 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
   useEffect(() => {
     // create initial graph
     initGraph(width, height);
-    setTimeout(() => changeNode({ x: 0, y: 0, type: nodeStyles.BRIDGE }), 1000); // TODO
   }, [width, height]);
 
   return (
