@@ -4,7 +4,7 @@ $node-color: lightgrey;
 $color-emphasis: 20%;
 $node-spacing: 0.15vh;
 
-.node {
+.node-basics {
   box-sizing: border-box;
   background-clip: content-box;
   display: block;
@@ -13,73 +13,76 @@ $node-spacing: 0.15vh;
   height: $node-size;
   padding: $node-spacing;
   
+  // &:hover {
+  //   TODO padding: $node-spacing + $node-hover-emphasis !important;
+  //   background-color: darken($node-color, $color-emphasis);
+  // }
+}
+
+@mixin node-color ($color: lightgrey) {
+  border: 0px;
+  background-color: $color;
+
   &:hover {
-    // TODO padding: $node-spacing + $node-hover-emphasis !important;
-    background-color: darken($node-color, $color-emphasis);
+    background-color: darken($color, $color-emphasis);
   }
 }
 
 .inactive-node {
-  @extend .node;
-  background-color: $node-color;
+  @extend .node-basics;
+  @include node-color;
+  //animation: 1s ease 1 pulse;
 }
 
 .wall-node {
-  @extend .node;
-  $node-color: black;
-  background-color: $node-color;
-
-  &:hover {
-    background-color: darken($node-color, $color-emphasis);
-  }
+  @extend .node-basics;
+  @include node-color(black);
+  // animation: 1s ease 1 pulse;
 }
 
 .start-node {
-  @extend .node;
-  $node-color: aquamarine;
-  background-color: $node-color;
-
-  &:hover {
-    background-color: darken($node-color, $color-emphasis);
-  }
+  @extend .node-basics;
+  @include node-color(aquamarine);
+  // animation: 1s ease 1 pulse;
 }
 
 .end-node {
-  @extend .node;
-  $node-color: aqua;
-  background-color: $node-color;
-
-  &:hover {
-    background-color: darken($node-color, $color-emphasis);
-  }
+  @extend .node-basics;
+  @include node-color(aqua);
+  // animation: 1s ease 1 pulse;
 }
 
 .bridge-node {
-  @extend .node;
-  $node-color: green;
-  background-color: $node-color;
-
-  &:hover {
-    background-color: darken($node-color, $color-emphasis);
-  }
+  @extend .node-basics;
+  @include node-color(green);
+  // animation: 1s ease 1 pulse;
 }
 
 .visited-node {
-  @extend .node;
-  $node-color: pink;
-  background-color: $node-color;
-
-  &:hover {
-    background-color: $node-color;
-  }
+  @extend .node-basics;
+  @include node-color(pink);
+  // animation: 1s ease 1 pulse;
 }
 
 .taken-node {
-  @extend .node;
-  $node-color: red;
-  background-color: $node-color;
-
-  &:hover {
-    background-color: $node-color;
-  }
+  @extend .node-basics;
+  @include node-color(red);
+  // animation: 1s ease 1 pulse;
 }
+
+// @keyframes pulse() {
+//   0% {
+//     background-color: $node-color;
+//     transform: scale(1);
+//   }
+
+//   50% {
+//     background-color: darken($node-color, $color-emphasis);
+//     transform: scale(0.9);
+//   }
+
+//   100% {
+//     background-color: $node-color;
+//     transform: scale(1);
+//   }
+// }
