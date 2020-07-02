@@ -5,14 +5,19 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 // TODO
-import { ModeType } from '../../redux/constants';
+
 // TODO
 // eslint-disable-next-line sort-imports
 import { RootState } from '../../redux/reducers';
 import modeActions from '../../redux/actions/mode';
+import { ChangeableNodeData, Graph, Point } from '../../constants/constants';
+import Dijkstras from '../../algorithms/Dijkstras';
+import graphActions from '../../redux/actions/graph';
 
 interface StateProps {
-  mode: ModeType;
+  graph: Graph;
+  startNode: Point | null;
+  endNode: Point | null;
 }
 
 interface DispatchProps {
@@ -20,14 +25,20 @@ interface DispatchProps {
   settingEndNode: () => void;
   settingWallNodes: () => void;
   settingBridgeNodes: () => void;
+  solving: () => void;
+  changeNode: (change: ChangeableNodeData) => void;
 }
 
 const CustomNavbar: React.FC<StateProps & DispatchProps> = ({
-  mode,
+  graph,
+  startNode,
+  endNode,
   settingStartNode,
   settingEndNode,
   settingWallNodes,
   settingBridgeNodes,
+  solving,
+  changeNode,
 }) => (
   <Navbar collapseOnSelect bg="dark" variant="dark" expand="md">
     <Navbar.Brand>Path Finder</Navbar.Brand>
@@ -46,47 +57,54 @@ const CustomNavbar: React.FC<StateProps & DispatchProps> = ({
         <button type="button" onClick={() => settingBridgeNodes()}>
           Build Bridges
         </button>
+        <button
+          type="button"
+          onClick={() => {
+            // requirements before solving
+            if (!startNode || !endNode) {
+              return;
+            }
+            // now in solving state
+            solving();
+
+            // solve with dijkstras TODO change the algorithm to be dynamic eventually
+            const { nodesVisited, nodesTaken } = Dijkstras.solve(
+              graph.toJS(),
+              startNode,
+              endNode,
+            );
+
+            console.log('visited:');
+            console.log(nodesVisited);
+            console.log('taken');
+            console.log(nodesTaken);
+
+            console.log('setting visited nodes:');
+            nodesVisited.map((node) => {
+              console.log(node);
+              changeNode({ x: node.x, y: node.y, visited: true });
+              return 1;
+            });
+
+            console.log('setting taken nodes');
+            nodesTaken.map((node) => {
+              console.log(node);
+              changeNode({ x: node.x, y: node.y, taken: true });
+              return 1;
+            });
+          }}
+        >
+          Solve
+        </button>
       </Nav>
     </Navbar.Collapse>
   </Navbar>
 );
 
-/* TODO
-const Navbar = () => (
-  <div className="navbar">
-    <h1>Logo</h1>
-
-    <div className="float-right">
-      <button>
-        blee bloop
-      </button>
-    </div>
-  </div>
-) */
-
-/*
-        <NavDropdown title="test 0" id="navbarDropdownTest">
-          <NavDropdown.Item>
-            Test
-          </NavDropdown.Item>
-          <NavDropdown.Item>
-            Test
-          </NavDropdown.Item>
-          <NavDropdown.Item>
-            Test
-          </NavDropdown.Item>
-          <NavDropdown.Item>
-            Test
-          </NavDropdown.Item>
-        </NavDropdown>
-
-        <NavDropdown title="test 1" id="testttt">
-          <NavDropdown.Item>YUH</NavDropdown.Item>
-        </NavDropdown>
-        */
-
 const mapStateToProps = (state: RootState): StateProps => ({
-  mode: state.mode.mode,
+  graph: state.graph.graph,
+  startNode: state.graph.startNode,
+  endNode: state.graph.endNode,
 });
 
 const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => ({
@@ -94,6 +112,8 @@ const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => ({
   settingEndNode: () => dispatch(modeActions.settingEndNode()),
   settingWallNodes: () => dispatch(modeActions.settingWallNodes()),
   settingBridgeNodes: () => dispatch(modeActions.settingBridgeNodes()),
+  solving: () => dispatch(modeActions.solving()),
+  changeNode: (change) => dispatch(graphActions.changeNode(change)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(CustomNavbar);

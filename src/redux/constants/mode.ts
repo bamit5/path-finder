@@ -1,13 +1,16 @@
 enum ModeConstants {
+  // user modes
   EDITING = 'EDITING',
   SOLVE = 'SOLVE',
   SOLVING = 'SOLVING',
   SOLVED_SUCCESS = 'SOLVED_SUCCESS',
   SOLVED_FAILURE = 'SOLVED_FAILURE',
+  // algorithm modes
   SET_SOLVING_ALG = 'SET_SOLVING_ALGORITHM',
   BFS = 'BFS',
   DIJKSTRAS = 'DIJKSTRAS',
   A_STAR = 'A_STAR',
+  // edit graph modes
   SETTING_WALL_NODES = 'wall-node',
   SETTING_START_NODE = 'start-node',
   SETTING_END_NODE = 'end-node',

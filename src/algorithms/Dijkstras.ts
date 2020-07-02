@@ -1,65 +1,75 @@
 import PQ from 'priorityqueuejs';
-import { NodeData } from '../constants/constants';
+import { NodeData, Point, weights } from '../constants/constants';
 
-type NodeGraph = NodeData[][];
+type NodeGraph = NodeData[][]; // TODO add to constants? maybe change name or something?
 
-// TODO set 'visited' to true to visualize nodes being visited, and 'partOfPath' to true to visualize a node being selected in a path
-const solve = (graph: NodeGraph, s: NodeData, e: NodeData): NodeGraph => {
-  // deep copy the graph to not change the original
-  graph = { ...graph };
-
+/**
+ * // TODO
+ * @param graph
+ * @param s
+ * @param e
+ */
+const solve = (graph: NodeGraph, s: Point, e: Point) => {
   // set start node distance to 0
-  s.dist = 0;
+  graph[s.x][s.y].dist = 0;
 
   // create min priority queue of distances
   const pq = new PQ((a: NodeData, b: NodeData) => b.dist - a.dist);
-  pq.enq(s);
+  pq.enq(graph[s.x][s.y]);
+
+  // create list to keep track of visited nodes
+  const nodesVisited: NodeData[] = [];
+
+  // create list to keep track of nodes taken in shortest path
+  const nodesTaken: NodeData[] = [];
 
   while (!pq.isEmpty()) {
     // get node with shortest distance in priority queue
     const cur: NodeData = pq.deq();
 
-    /* // TODO -- not sure if this will work, test it -- if already visited, continue
-    if (cur.dist) continue; */
-    // mark it as visited
+    /* // TODO -- not sure if this will work, test it -- if already visited, continue */
+    if (cur.visited) continue;
+
+    // if cur is the end node, then shortest path is found
+    if (cur === graph[e.x][e.y]) break; // TODO should this be before marking it as visited?
+
+    // mark it as visited, add it to visited nodes
     cur.visited = true;
+    nodesVisited.push(cur);
 
-    // if destination is cur node, then you've found the shortest path
-    if (cur === e) break;
-
-    // each node has max of 4 neighbors: left, right, top, bottom
+    // each node has max of 4 neighbors: the left, right, top, and bottom nodes
     const neighbors: NodeData[] = [];
     if (cur.x > 0) neighbors.push(graph[cur.x - 1][cur.y]); // left neighbor
     if (cur.x < graph.length - 1) neighbors.push(graph[cur.x + 1][cur.y]); // right neighbor
     if (cur.y > 0) neighbors.push(graph[cur.x][cur.y - 1]); // top neighbor
     if (cur.y < graph[0].length - 1) neighbors.push(graph[cur.x][cur.y + 1]); // bottom neighbor
 
-    neighbors.forEach((n) => {
-      // if there is a shorter path to n through cur, update n's dist/prev and insert n to pq
-      if (
-        n.dist >
-        cur.dist + 1 /* TODO the 1 should be the weight of the edge */
-      ) {
-        n.dist = cur.dist + 1 /* TODO the 1 should be the weight of the edge */;
-        n.prev = cur;
-        pq.enq(n);
+    neighbors.forEach((neighbor) => {
+      // if there is a shorter path to neighbor through cur, update neighbor's dist/prev and insert it into pq
+      if (cur.dist + weights[neighbor.type] < neighbor.dist) {
+        neighbor.dist = cur.dist + weights[neighbor.type];
+        neighbor.prev = cur;
+        pq.enq(neighbor);
       }
     });
   }
 
-  // didn't find a path!
-  if (!e.prev) {
-    return graph; // TODO throw an error?
+  // take start node out of nodesVisited
+  nodesVisited.shift();
+
+  // check if node right before end exists
+  let cur: NodeData | null = graph[e.x][e.y].prev;
+  if (cur) {
+    // get the nodes taken in shortest path
+    while (cur.prev != null) {
+      cur.taken = true; // TODO i don't think things like this will be necessary... delete it (and others)?
+      nodesTaken.unshift(cur);
+      cur = cur.prev;
+    }
   }
 
-  // starting from the node previous to the end node, mark all the nodes in the shortest path
-  let cur: NodeData = e.prev;
-  while (cur.prev != null) {
-    cur.taken = true;
-    cur = cur.prev;
-  }
-
-  return graph;
+  // return the changes made
+  return { nodesVisited, nodesTaken };
 };
 
-export default solve;
+export default { solve };

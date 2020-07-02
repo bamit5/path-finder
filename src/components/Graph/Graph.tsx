@@ -1,4 +1,4 @@
-import React, { Dispatch, useEffect } from 'react';
+import React, { Dispatch, useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import Node from '../Node/Node';
 import './Graph.scss';
@@ -30,13 +30,23 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
   initGraph,
   changeNode,
 }) => {
+  // dragging used for drag to select
+  const [dragging, setDragging] = useState(false);
+
   useEffect(() => {
     // create initial graph
     initGraph(width, height);
   }, [width, height]);
 
   return (
-    <div className="graph-wrapper">
+    <div
+      role="application"
+      aria-label="Graph that contains the nodes"
+      className="graph-wrapper"
+      // TODO check async? might create problems
+      onMouseDown={async () => setDragging(true)}
+      onMouseUp={async () => setDragging(false)}
+    >
       {graph.map((row, x) => (
         <div>
           {row.map((node, y) => (
@@ -46,6 +56,7 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
               type={node.type}
               visited={node.visited}
               taken={node.taken}
+              dragging={dragging}
             />
           ))}
         </div>

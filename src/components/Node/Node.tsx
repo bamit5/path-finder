@@ -22,6 +22,7 @@ interface NodeProps {
   type: string;
   visited: boolean;
   taken: boolean;
+  dragging: boolean;
 }
 
 interface StateProps {
@@ -42,6 +43,7 @@ const Node: React.FC<NodeProps & StateProps & DispatchProps> = ({
   type,
   visited,
   taken,
+  dragging,
   mode,
   settingNodeType,
   startNode,
@@ -55,6 +57,7 @@ const Node: React.FC<NodeProps & StateProps & DispatchProps> = ({
     changeNode({ x: point.x, y: point.y, type: _type });
 
   useEffect(() => {
+    console.log(visited);
     if (taken) setStyle(nodeStyles.TAKEN);
     else if (visited) setStyle(nodeStyles.VISITED);
     else setStyle(type);
@@ -72,6 +75,8 @@ const Node: React.FC<NodeProps & StateProps & DispatchProps> = ({
         // toggle inactive
         setType(nodeStyles.INACTIVE);
       } else {
+        // always set the type to settingNodeType
+        setType(settingNodeType);
         // eslint-disable-next-line default-case
         switch (settingNodeType) {
           case ModeConstants.SETTING_START_NODE:
@@ -104,8 +109,6 @@ const Node: React.FC<NodeProps & StateProps & DispatchProps> = ({
             // TODO
             break;
         }
-        // always set the type to settingNodeType
-        setType(settingNodeType);
       }
     }
   };
@@ -115,8 +118,14 @@ const Node: React.FC<NodeProps & StateProps & DispatchProps> = ({
       aria-label="Node"
       role="button"
       tabIndex={0}
-      onClick={handleClick}
-      onKeyPress={(e) => {
+      // TODO check about the async... might create problems?
+      onMouseDown={async () => {
+        if (!dragging) handleClick();
+      }}
+      onMouseEnter={async () => {
+        if (dragging) handleClick();
+      }}
+      onKeyPress={async (e) => {
         if (e.key === ENTER || e.key === SPACE) {
           handleClick();
         }

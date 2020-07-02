@@ -14,7 +14,7 @@ $node-spacing: 0.15vh;
   padding: $node-spacing;
   
   &:hover {
-    padding: $node-spacing + $node-hover-emphasis !important;
+    // TODO padding: $node-spacing + $node-hover-emphasis !important;
     background-color: darken($node-color, $color-emphasis);
   }
 }
@@ -61,5 +61,25 @@ $node-spacing: 0.15vh;
 
   &:hover {
     background-color: darken($node-color, $color-emphasis);
+  }
+}
+
+.visited-node {
+  @extend .node;
+  $node-color: pink;
+  background-color: $node-color;
+
+  &:hover {
+    background-color: $node-color;
+  }
+}
+
+.taken-node {
+  @extend .node;
+  $node-color: red;
+  background-color: $node-color;
+
+  &:hover {
+    background-color: $node-color;
   }
 }
