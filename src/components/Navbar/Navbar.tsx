@@ -11,7 +11,7 @@ import { Dispatch } from 'redux';
 import { RootState } from '../../redux/reducers';
 import modeActions from '../../redux/actions/mode';
 import { ChangeableNodeData, Graph, Point } from '../../constants/constants';
-import Dijkstras from '../../algorithms/Dijkstras';
+
 import graphActions from '../../redux/actions/graph';
 
 interface StateProps {
@@ -66,32 +66,6 @@ const CustomNavbar: React.FC<StateProps & DispatchProps> = ({
             }
             // now in solving state
             solving();
-
-            // solve with dijkstras TODO change the algorithm to be dynamic eventually
-            const { nodesVisited, nodesTaken } = Dijkstras.solve(
-              graph.toJS(),
-              startNode,
-              endNode,
-            );
-
-            console.log('visited:');
-            console.log(nodesVisited);
-            console.log('taken');
-            console.log(nodesTaken);
-
-            console.log('setting visited nodes:');
-            nodesVisited.map((node) => {
-              console.log(node);
-              changeNode({ x: node.x, y: node.y, visited: true });
-              return 1;
-            });
-
-            console.log('setting taken nodes');
-            nodesTaken.map((node) => {
-              console.log(node);
-              changeNode({ x: node.x, y: node.y, taken: true });
-              return 1;
-            });
           }}
         >
           Solve

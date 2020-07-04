@@ -1,7 +1,47 @@
+$node-size: 5vh;
+$node-hover-emphasis: 0.15vh;
+$node-color: lightgrey;
+$color-emphasis: 20%;
+$node-spacing: 0.15vh;
+$node-types:
+  "inactive" lightgrey,
+  "wall" black,
+  "start" aquamarine,
+  "end" aqua,
+  "bridge" green,
+  "visited" pink, 
+  "taken" red;
+
 .graph-wrapper {
   display: flex;
   width: 100%;
   flex-wrap: wrap;
   justify-content: center;
   cursor: pointer; // TODO which shape mouse?
+}
+
+.node-basics {
+  box-sizing: border-box;
+  background-clip: content-box;
+  display: block;
+  position: relative;
+  width: $node-size;
+  height: $node-size;
+  padding: $node-spacing;
+  border: 0px;
+}
+
+@mixin node-color ($color: lightgrey) {
+  background-color: $color;
+
+  &:hover {
+    background-color: darken($color, $color-emphasis);
+  }
+}
+
+@each $type, $color in $node-types {
+  .#{$type}-node {
+    @extend .node-basics;
+    @include node-color($color)
+  }
 }
