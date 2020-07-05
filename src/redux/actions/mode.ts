@@ -1,19 +1,8 @@
 import { ModeConstants } from '../constants';
+import { ModeType } from '../constants/mode';
 
-const editing = () => ({
-  type: ModeConstants.EDITING,
-});
-
-const solving = () => ({
-  type: ModeConstants.SOLVING,
-});
-
-const solvedSuccess = () => ({
-  type: ModeConstants.SOLVED_SUCCESS,
-});
-
-const solvedFailure = () => ({
-  type: ModeConstants.SOLVED_FAILURE,
+const setMode = (mode: ModeType) => ({
+  type: mode,
 });
 
 const setSolvingAlg = (alg: string) => ({
@@ -38,10 +27,7 @@ const settingBridgeNodes = () => ({
 });
 
 const modeActions = {
-  editing,
-  solving,
-  solvedSuccess,
-  solvedFailure,
+  setMode,
   setSolvingAlg,
   settingWallNodes,
   settingStartNode,

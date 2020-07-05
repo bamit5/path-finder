@@ -10,12 +10,12 @@ import { Dispatch } from 'redux';
 // eslint-disable-next-line sort-imports
 import { RootState } from '../../redux/reducers';
 import modeActions from '../../redux/actions/mode';
-import { ChangeableNodeData, Graph, Point } from '../../constants/constants';
-
+import { Point } from '../../constants/constants';
+import { ModeConstants, ModeType } from '../../redux/constants';
 import graphActions from '../../redux/actions/graph';
 
 interface StateProps {
-  graph: Graph;
+  mode: ModeType;
   startNode: Point | null;
   endNode: Point | null;
 }
@@ -25,20 +25,20 @@ interface DispatchProps {
   settingEndNode: () => void;
   settingWallNodes: () => void;
   settingBridgeNodes: () => void;
-  solving: () => void;
-  changeNode: (change: ChangeableNodeData) => void;
+  setMode: (mode: ModeType) => void;
+  resetGraph: () => void;
 }
 
 const CustomNavbar: React.FC<StateProps & DispatchProps> = ({
-  graph,
+  mode,
   startNode,
   endNode,
   settingStartNode,
   settingEndNode,
   settingWallNodes,
   settingBridgeNodes,
-  solving,
-  changeNode,
+  setMode,
+  resetGraph,
 }) => (
   <Navbar collapseOnSelect bg="dark" variant="dark" expand="md">
     <Navbar.Brand>Path Finder</Navbar.Brand>
@@ -61,14 +61,28 @@ const CustomNavbar: React.FC<StateProps & DispatchProps> = ({
           type="button"
           onClick={() => {
             // requirements before solving
-            if (!startNode || !endNode) {
-              return;
+            if (startNode && endNode) {
+              // now in solving state
+              setMode(ModeConstants.SOLVING);
             }
-            // now in solving state
-            solving();
           }}
         >
           Solve
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            if (
+              mode !== ModeConstants.SOLVING &&
+              mode !== ModeConstants.VISUALIZING
+            ) {
+              // now reseting
+              resetGraph();
+              setMode(ModeConstants.EDITING);
+            }
+          }}
+        >
+          Reset
         </button>
       </Nav>
     </Navbar.Collapse>
@@ -76,7 +90,7 @@ const CustomNavbar: React.FC<StateProps & DispatchProps> = ({
 );
 
 const mapStateToProps = (state: RootState): StateProps => ({
-  graph: state.graph.graph,
+  mode: state.mode.mode,
   startNode: state.graph.startNode,
   endNode: state.graph.endNode,
 });
@@ -86,8 +100,8 @@ const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => ({
   settingEndNode: () => dispatch(modeActions.settingEndNode()),
   settingWallNodes: () => dispatch(modeActions.settingWallNodes()),
   settingBridgeNodes: () => dispatch(modeActions.settingBridgeNodes()),
-  solving: () => dispatch(modeActions.solving()),
-  changeNode: (change) => dispatch(graphActions.changeNode(change)),
+  setMode: (mode) => dispatch(modeActions.setMode(mode)),
+  resetGraph: () => dispatch(graphActions.resetGraph()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(CustomNavbar);

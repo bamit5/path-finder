@@ -13,6 +13,7 @@ export interface GraphState {
   graph: Graph;
   startNode: Point | null;
   endNode: Point | null;
+  reset: boolean;
 }
 
 const initGraph = (width: number, height: number): Graph => {
@@ -41,6 +42,7 @@ const initialState: GraphState = {
   graph: initGraph(0, 0),
   startNode: null,
   endNode: null,
+  reset: false,
 };
 
 const graph = (state = initialState, action: AnyAction) => {
@@ -85,6 +87,18 @@ const graph = (state = initialState, action: AnyAction) => {
         ),
       };
     }
+
+    case GraphConstants.RESET:
+      return {
+        ...state,
+        reset: true,
+      };
+
+    case GraphConstants.DONE_RESETTING:
+      return {
+        ...state,
+        reset: false,
+      };
 
     default:
       return state;

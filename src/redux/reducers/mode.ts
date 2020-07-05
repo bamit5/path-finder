@@ -24,29 +24,22 @@ const mode = (state = initialState, action: AnyAction) => {
         mode: ModeConstants.EDITING,
       };
 
-    case ModeConstants.SOLVE:
-      // TODO call whichever function to solve the maze here?
-      return {
-        ...state,
-        mode: ModeConstants.SOLVING,
-      };
-
     case ModeConstants.SOLVING:
       return {
         ...state,
         mode: ModeConstants.SOLVING,
       };
 
-    case ModeConstants.SOLVED_SUCCESS:
+    case ModeConstants.VISUALIZING:
       return {
         ...state,
-        mode: ModeConstants.SOLVED_SUCCESS,
+        mode: ModeConstants.VISUALIZING,
       };
 
-    case ModeConstants.SOLVED_FAILURE:
+    case ModeConstants.COMPLETED:
       return {
         ...state,
-        mode: ModeConstants.SOLVED_FAILURE,
+        mode: ModeConstants.COMPLETED,
       };
 
     case ModeConstants.SETTING_WALL_NODES:

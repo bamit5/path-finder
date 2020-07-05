@@ -9,7 +9,7 @@ type NodeGraph = NodeData[][]; // TODO add to constants? maybe change name or so
  * @param s
  * @param e
  */
-const solve = (graph: NodeGraph, s: Point, e: Point) => {
+const dijkstras = (graph: NodeGraph, s: Point, e: Point) => {
   // set start node distance to 0
   graph[s.x][s.y].dist = 0;
 
@@ -70,6 +70,20 @@ const solve = (graph: NodeGraph, s: Point, e: Point) => {
 
   // return the changes made
   return { nodesVisited, nodesTaken };
+};
+
+const solve = (graph: NodeGraph, s: Point, e: Point, bridgeNode?: Point) => {
+  if (bridgeNode) {
+    // solve from start to bridge and bridge to end
+    const bridgeSol = dijkstras(graph, s, bridgeNode);
+    const endSol = dijkstras(graph, bridgeNode, e);
+
+    // combine solutions and return them
+    const nodesVisited = bridgeSol.nodesVisited.concat(endSol.nodesVisited);
+    const nodesTaken = bridgeSol.nodesTaken.concat(endSol.nodesTaken);
+    return { nodesVisited, nodesTaken };
+  }
+  return dijkstras(graph, s, e);
 };
 
 export default { solve };

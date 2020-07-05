@@ -3,6 +3,9 @@ enum GraphConstants {
   SET_END_NODE = 'SET_END_NODE',
   INIT_GRAPH = 'RESET_GRAPH',
   CHANGE_NODE = 'SET_NODE',
+  RESET = 'RESET',
+  DONE_RESETTING = 'DONE_RESETTING',
+  SET_SUCCESS = 'SET_SUCCESS',
 }
 
 export default GraphConstants;

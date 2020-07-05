@@ -1,10 +1,9 @@
 enum ModeConstants {
   // user modes
   EDITING = 'EDITING',
-  SOLVE = 'SOLVE',
   SOLVING = 'SOLVING',
-  SOLVED_SUCCESS = 'SOLVED_SUCCESS',
-  SOLVED_FAILURE = 'SOLVED_FAILURE',
+  VISUALIZING = 'VISUALIZING',
+  COMPLETED = 'COMPLETED',
   // algorithm modes
   SET_SOLVING_ALG = 'SET_SOLVING_ALGORITHM',
   BFS = 'BFS',
@@ -20,8 +19,8 @@ enum ModeConstants {
 type Mode =
   | ModeConstants.EDITING
   | ModeConstants.SOLVING
-  | ModeConstants.SOLVED_SUCCESS
-  | ModeConstants.SOLVED_FAILURE;
+  | ModeConstants.VISUALIZING
+  | ModeConstants.COMPLETED;
 
 type Node =
   | ModeConstants.SETTING_WALL_NODES
