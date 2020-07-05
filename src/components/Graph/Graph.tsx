@@ -10,15 +10,7 @@ import { connect } from 'react-redux';
 import _ from 'underscore';
 import './Graph.scss';
 
-import {
-  ChangeableNodeData,
-  ENTER,
-  NodeData,
-  Point,
-  SPACE,
-  Graph as StateGraph,
-  nodeStyles,
-} from '../../constants/constants';
+import { ENTER, Point, SPACE, nodeStyles } from '../../constants/constants';
 import { RootState } from '../../redux/reducers';
 import graphActions from '../../redux/actions/graph';
 import { ModeConstants, ModeType, NodeType } from '../../redux/constants';
@@ -32,7 +24,6 @@ interface GraphProps {
 
 interface StateProps {
   mode: ModeType;
-  graph: StateGraph;
   startNode: Point | null;
   endNode: Point | null;
   settingNodeType: NodeType;
@@ -40,8 +31,6 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  initGraph: (width: number, height: number) => void;
-  changeNode: (change: ChangeableNodeData) => void;
   setStartNode: (startNode: Point | null) => void;
   setEndNode: (endNode: Point | null) => void;
   setMode: (mode: ModeType) => void;
@@ -54,13 +43,10 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = forwardRef(
     width,
     height,
     mode,
-    graph,
     startNode,
     endNode,
     settingNodeType,
     reset,
-    initGraph,
-    changeNode,
     setStartNode,
     setEndNode,
     setMode,
@@ -70,20 +56,27 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = forwardRef(
     // dragging used for drag to select
     const [dragging, setDragging] = useState(false);
     // used for animations
-    const [nodeRefs, setNodeRefs] = useState<RefObject<HTMLDivElement>[]>(
-      Array(width * height)
+    const [nodeRefs, setNodeRefs] = useState<RefObject<HTMLDivElement>[][]>(
+      Array(width)
         .fill(null)
-        .map(() => createRef<HTMLDivElement>()),
+        .map(() =>
+          Array(height)
+            .fill(null)
+            .map(() => createRef<HTMLDivElement>()),
+        ),
     );
 
     useEffect(() => {
-      // create initial graph
-      initGraph(width, height);
-      // update references
+      // create new graph
       setNodeRefs(
-        Array(width * height)
+        // TODO have this also be in reset. create a function for this?
+        Array(width)
           .fill(null)
-          .map((_, i) => nodeRefs[i] || createRef<HTMLDivElement>()),
+          .map((_, x) =>
+            Array(height)
+              .fill(null)
+              .map((__, y) => nodeRefs[x][y] || createRef<HTMLDivElement>()),
+          ),
       );
     }, [width, height]);
 
@@ -91,10 +84,23 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = forwardRef(
       // handle solving and visualzing
       if (mode === ModeConstants.SOLVING && startNode && endNode) {
         // solve with dijkstras // TODO change the algorithm type to be dynamic eventually
+        const bridgeNodes: Point[] = [];
+        nodeRefs.forEach((row, x) =>
+          row.forEach((ref, y) => {
+            if (ref.current && ref.current.className === nodeStyles.BRIDGE) {
+              bridgeNodes.push({ x, y });
+            }
+          }),
+        );
         const { nodesVisited, nodesTaken } = Dijkstras.solve(
-          graph.toJS(),
+          nodeRefs.map((row) =>
+            row.map((ref) =>
+              ref.current ? ref.current.className : nodeStyles.INACTIVE,
+            ),
+          ), // TODO need to setup graph correctly in dijkstras! and change the file accordingly
           startNode,
           endNode,
+          bridgeNodes.length > 0 ? bridgeNodes[0] : undefined,
         );
 
         // set graph success and begin visualizing
@@ -102,9 +108,9 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = forwardRef(
         setMode(ModeConstants.VISUALIZING);
 
         // visualizing visited nodes
-        const speed = 30; // TODO
+        const speed = 30; // TODO dynamify
         nodesVisited.forEach((node, i) => {
-          const ref = nodeRefs[node.x * height + node.y].current;
+          const ref = nodeRefs[node.x][node.y].current;
           if (ref) {
             setTimeout(() => {
               ref.className = 'visited-node';
@@ -114,7 +120,7 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = forwardRef(
 
         // visualize taken nodes after visited nodes
         nodesTaken.forEach((node, i) => {
-          const ref = nodeRefs[node.x * height + node.y].current;
+          const ref = nodeRefs[node.x][node.y].current;
           if (ref) {
             setTimeout(() => {
               ref.className = 'taken-node';
@@ -134,13 +140,13 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = forwardRef(
       // handle resetting
       if (reset) {
         // reset graph styles
-        nodeRefs.forEach((node) => {
-          if (node.current) node.current.className = nodeStyles.INACTIVE;
-        });
-        // get new graph // TODO is this needed? can you just have nodes be represented by their current className?
-        initGraph(width, height);
-
-        // reset start/end/bridge Nodes
+        nodeRefs.forEach((row) =>
+          row.forEach((ref) => {
+            if (ref.current) ref.current.className = nodeStyles.INACTIVE;
+          }),
+        );
+        // TODO have default start/end nodes here
+        // reset start/end Nodes
         setStartNode(null);
         setEndNode(null);
 
@@ -148,30 +154,31 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = forwardRef(
       }
     }, [reset]);
 
-    const handleClick = ({ x, y, type }: NodeData) => {
+    const handleClick = (
+      ref: RefObject<HTMLDivElement>,
+      x: number,
+      y: number,
+    ) => {
       // only update style if the mode allows for user changes
-      if (mode === ModeConstants.EDITING) {
+      if (mode === ModeConstants.EDITING && ref.current) {
         // check if should remove this node from any of the redux states
         if (_.isEqual({ x, y }, startNode)) setStartNode(null);
         if (_.isEqual({ x, y }, endNode)) setEndNode(null);
-        // TODO if (bridgeNodes.includes(ref)) /* TODO change this to be in redux */bridgeNodes.remove(ref)
+        // if (bridgeNodes.includes({ x, y })) /* TODO change this to be in redux */bridgeNodes.remove(ref)
 
-        if (type !== nodeStyles.INACTIVE) {
+        if (ref.current.className !== nodeStyles.INACTIVE) {
           // toggle inactive
-          changeNode({ x, y, type: nodeStyles.INACTIVE });
+          ref.current.className = nodeStyles.INACTIVE;
         } else {
           // always set the type to settingNodeType
-          changeNode({ x, y, type: settingNodeType });
+          ref.current.className = settingNodeType;
           // eslint-disable-next-line default-case
           switch (settingNodeType) {
             case ModeConstants.SETTING_START_NODE:
               // reset previous start node's style (if it exists)
-              if (startNode) {
-                changeNode({
-                  x: startNode.x,
-                  y: startNode.y,
-                  type: nodeStyles.INACTIVE,
-                });
+              if (startNode && nodeRefs[startNode.x][startNode.y].current) {
+                nodeRefs[startNode.x][startNode.y].current!.className =
+                  nodeStyles.INACTIVE;
               }
               // set this node to start node
               setStartNode({ x, y });
@@ -179,12 +186,9 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = forwardRef(
 
             case ModeConstants.SETTING_END_NODE:
               // reset previous end node's style (if it exists)
-              if (endNode) {
-                changeNode({
-                  x: endNode.x,
-                  y: endNode.y,
-                  type: nodeStyles.INACTIVE,
-                });
+              if (endNode && nodeRefs[endNode.x][endNode.y].current) {
+                nodeRefs[endNode.x][endNode.y].current!.className =
+                  nodeStyles.INACTIVE;
               }
               // set this node to end node
               setEndNode({ x, y });
@@ -208,25 +212,27 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = forwardRef(
         onMouseDown={async () => setDragging(true)}
         onMouseUp={async () => setDragging(false)}
       >
-        {graph.map((row, x) => (
+        {nodeRefs.map((row, x) => (
           <div>
-            {row.map((node, y) => (
+            {row.map((ref, y) => (
               // create a node for each index in the 2d array
               <div
                 aria-label="Node"
                 role="button"
                 tabIndex={0}
-                ref={nodeRefs[x * height + y]}
-                className={node.type}
+                ref={ref}
+                className={
+                  (ref.current && ref.current.className) || nodeStyles.INACTIVE // TODO
+                }
                 onMouseDown={async () => {
-                  if (!dragging) handleClick(node);
+                  if (!dragging) handleClick(ref, x, y);
                 }}
                 onMouseEnter={async () => {
-                  if (dragging) handleClick(node);
+                  if (dragging) handleClick(ref, x, y);
                 }}
                 onKeyPress={async (e) => {
                   if (e.key === ENTER || e.key === SPACE) {
-                    handleClick(node);
+                    handleClick(ref, x, y);
                   }
                 }}
               />
@@ -240,7 +246,6 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = forwardRef(
 
 const mapStateToProps = (state: RootState): StateProps => ({
   mode: state.mode.mode,
-  graph: state.graph.graph,
   startNode: state.graph.startNode,
   endNode: state.graph.endNode,
   settingNodeType: state.mode.settingNodeType,
@@ -248,8 +253,6 @@ const mapStateToProps = (state: RootState): StateProps => ({
 });
 
 const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => ({
-  initGraph: (width, height) => dispatch(graphActions.initGraph(width, height)),
-  changeNode: (change) => dispatch(graphActions.changeNode(change)),
   setStartNode: (startNode) => dispatch(graphActions.setStartNode(startNode)),
   setEndNode: (endNode) => dispatch(graphActions.setEndNode(endNode)),
   setMode: (mode) => dispatch(modeActions.setMode(mode)),

@@ -1,13 +1,7 @@
-import { List } from 'immutable';
 import { AnyAction } from 'redux';
+import { List } from 'immutable';
+import { Graph, NodeData, Point, defaultNode } from '../../constants/constants';
 import { GraphConstants } from '../constants';
-import {
-  ChangeableNodeData,
-  Graph,
-  NodeData,
-  Point,
-  defaultNode,
-} from '../../constants/constants';
 
 export interface GraphState {
   graph: Graph;
@@ -16,8 +10,8 @@ export interface GraphState {
   reset: boolean;
 }
 
+// TODO delete
 const initGraph = (width: number, height: number): Graph => {
-  // TODO write this better
   const initArr = Array(width).fill(width);
   for (let x = 0; x < initArr.length; x++) {
     initArr[x] = Array(height);
@@ -58,35 +52,6 @@ const graph = (state = initialState, action: AnyAction) => {
         ...state,
         endNode: action.message,
       };
-
-    case GraphConstants.INIT_GRAPH: {
-      const { width, height } = action.message;
-      return {
-        ...state,
-        graph: initGraph(width, height),
-      };
-    }
-
-    case GraphConstants.CHANGE_NODE: {
-      const change: ChangeableNodeData = action.message;
-      return {
-        ...state,
-        graph: state.graph.updateIn(
-          [change.x, change.y],
-          (original): NodeData => ({
-            // can't change
-            x: original.x,
-            y: original.y,
-            dist: original.dist,
-            prev: original.prev,
-            // can change
-            type: change.type ? change.type : original.type,
-            visited: change.visited ? change.visited : original.visited,
-            taken: change.taken ? change.taken : original.taken,
-          }),
-        ),
-      };
-    }
 
     case GraphConstants.RESET:
       return {

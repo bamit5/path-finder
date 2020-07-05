@@ -1,5 +1,5 @@
 import PQ from 'priorityqueuejs';
-import { NodeData, Point, weights } from '../constants/constants';
+import { NodeData, Point, defaultNode, weights } from '../constants/constants';
 
 type NodeGraph = NodeData[][]; // TODO add to constants? maybe change name or something?
 
@@ -72,18 +72,37 @@ const dijkstras = (graph: NodeGraph, s: Point, e: Point) => {
   return { nodesVisited, nodesTaken };
 };
 
-const solve = (graph: NodeGraph, s: Point, e: Point, bridgeNode?: Point) => {
+// TODO set it up for multiple bridge nodes
+const solve = (
+  types: string[][] /* TODO set this to be only node types */,
+  s: Point,
+  e: Point,
+  bridgeNode?: Point,
+) => {
+  // create function that can create a new deep copy of correctly formatted graph
+  const graphCopy = (): NodeGraph =>
+    types.map((row, x) =>
+      row.map((type, y) => ({ ...defaultNode, type, x, y })),
+    );
+
   if (bridgeNode) {
+    console.log('bridge node exists!');
+    console.log(bridgeNode);
     // solve from start to bridge and bridge to end
-    const bridgeSol = dijkstras(graph, s, bridgeNode);
-    const endSol = dijkstras(graph, bridgeNode, e);
+    const bridgeSol = dijkstras(graphCopy(), s, bridgeNode);
+    const endSol = dijkstras(graphCopy(), bridgeNode, e);
+
+    console.log(bridgeSol);
+    console.log(endSol);
 
     // combine solutions and return them
     const nodesVisited = bridgeSol.nodesVisited.concat(endSol.nodesVisited);
     const nodesTaken = bridgeSol.nodesTaken.concat(endSol.nodesTaken);
+    console.log(nodesVisited);
+    console.log(nodesTaken);
     return { nodesVisited, nodesTaken };
   }
-  return dijkstras(graph, s, e);
+  return dijkstras(graphCopy(), s, e);
 };
 
 export default { solve };
