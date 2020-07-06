@@ -6,7 +6,7 @@ import useWindowDimensions from './components/WindowDimensions/WindowDimensions'
 import Navbar from './components/Navbar/Navbar';
 import { pxToVh } from './constants/constants';
 
-const nodeSize = 5; // TODO should go in constants. can you somehow connect this with the css file?
+const nodeSize = 4; // TODO should go in constants. can you somehow connect this with the css file?
 
 const App = () => {
   const { width, height } = useWindowDimensions();

@@ -1,11 +1,8 @@
-import PQ from 'priorityqueuejs';
-
 import {
   NodeData,
   Point,
   defaultNode,
   nodeStyles,
-  weights,
 } from '../constants/constants';
 
 type NodeGraph = NodeData[][]; // TODO add to constants? maybe change name or something?
@@ -17,12 +14,12 @@ type NodeGraph = NodeData[][]; // TODO add to constants? maybe change name or so
  * @param e
  */
 const dijkstras = (graph: NodeGraph, s: Point, e: Point) => {
-  // create min priority queue of distances
-  const pq = new PQ((a: NodeData, b: NodeData) => b.dist - a.dist);
+  // create queue to keep track of nodes
+  const q: NodeData[] = [];
 
   // set start node distance to 0 and enqueue it
   graph[s.x][s.y].dist = 0;
-  pq.enq(graph[s.x][s.y]);
+  q.push(graph[s.x][s.y]);
 
   // create list to keep track of visited nodes
   const nodesVisited: NodeData[] = [];
@@ -30,18 +27,14 @@ const dijkstras = (graph: NodeGraph, s: Point, e: Point) => {
   // create list to keep track of nodes taken in shortest path
   const nodesTaken: NodeData[] = [];
 
-  while (!pq.isEmpty()) {
-    // get node with shortest distance in priority queue
-    const cur: NodeData = pq.deq();
-
-    // if already visited, continue
-    if (cur.visited) continue;
+  while (q.length > 0) {
+    // get first node from queue
+    const cur: NodeData = q.shift()!;
 
     // if cur is the end node, then shortest path is found
     if (cur === graph[e.x][e.y]) break;
 
-    // mark it as visited, add it to visited nodes (if it should be visualized)
-    cur.visited = true;
+    // add it to visited nodes (if it should be visualized)
     if (
       cur.type !== nodeStyles.START &&
       cur.type !== nodeStyles.END &&
@@ -57,12 +50,13 @@ const dijkstras = (graph: NodeGraph, s: Point, e: Point) => {
     if (cur.y > 0) neighbors.push(graph[cur.x][cur.y - 1]); // top neighbor
     if (cur.y < graph[0].length - 1) neighbors.push(graph[cur.x][cur.y + 1]); // bottom neighbor
 
-    neighbors.forEach((neighbor) => {
-      // if there is a shorter path to neighbor through cur, update neighbor's dist/prev and insert it into pq
-      if (cur.dist + weights[neighbor.type] < neighbor.dist) {
-        neighbor.dist = cur.dist + weights[neighbor.type];
-        neighbor.prev = cur;
-        pq.enq(neighbor);
+    neighbors.forEach((n) => {
+      // if neighbor is unvisited and can be traversed
+      if (n.dist === Number.POSITIVE_INFINITY && n.type !== nodeStyles.WALL) {
+        // set dist, add previous, and push to the queue
+        n.dist = cur.dist + 1;
+        n.prev = cur;
+        q.push(n);
       }
     });
   }

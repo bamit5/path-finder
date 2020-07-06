@@ -1,5 +1,3 @@
-import { List } from 'immutable';
-
 export const pxToVh = (px: number): number => px * 0.16233766233766234;
 export const vhToPx = (vh: number): number => vh / 0.16233766233766234;
 
@@ -13,19 +11,12 @@ export interface NodeData {
   prev: NodeData | null;
   type: string;
   visited: boolean;
-  taken: boolean;
 }
-
-// creates an interface in which dist, prev, type, visited, and taken are optional, and x and y are required
-export type ChangeableNodeData = Partial<Omit<NodeData, 'x' | 'y'>> &
-  Required<Pick<NodeData, 'x' | 'y'>>;
 
 export interface Point {
   x: number;
   y: number;
 }
-
-export type Graph = List<List<NodeData>>;
 
 export const nodeStyles = {
   INACTIVE: 'inactive-node',
@@ -44,7 +35,6 @@ export const defaultNode: NodeData = {
   prev: null,
   type: nodeStyles.INACTIVE,
   visited: false,
-  taken: false,
 };
 
 export const weights = {

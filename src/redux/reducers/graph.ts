@@ -1,17 +1,16 @@
 import { AnyAction } from 'redux';
 import { List } from 'immutable';
-import { Graph, NodeData, Point, defaultNode } from '../../constants/constants';
+import { NodeData, Point, defaultNode } from '../../constants/constants';
 import { GraphConstants } from '../constants';
 
 export interface GraphState {
-  graph: Graph;
   startNode: Point | null;
   endNode: Point | null;
   reset: boolean;
 }
 
 // TODO delete
-const initGraph = (width: number, height: number): Graph => {
+const initGraph = (width: number, height: number) /* TODO: Graph */ => {
   const initArr = Array(width).fill(width);
   for (let x = 0; x < initArr.length; x++) {
     initArr[x] = Array(height);
@@ -33,7 +32,6 @@ const initGraph = (width: number, height: number): Graph => {
 };
 
 const initialState: GraphState = {
-  graph: initGraph(0, 0),
   startNode: null,
   endNode: null,
   reset: false,

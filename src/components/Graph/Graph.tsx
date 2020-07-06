@@ -15,6 +15,8 @@ import { RootState } from '../../redux/reducers';
 import graphActions from '../../redux/actions/graph';
 import { ModeConstants, ModeType, NodeType } from '../../redux/constants';
 import Dijkstras from '../../algorithms/Dijkstras';
+// import AStar from '../../algorithms/AStar';
+// import BFS from '../../algorithms/BFS';
 import modeActions from '../../redux/actions/mode';
 
 interface GraphProps {

@@ -1,5 +1,4 @@
 import PQ from 'priorityqueuejs';
-
 import {
   NodeData,
   Point,
@@ -16,9 +15,16 @@ type NodeGraph = NodeData[][]; // TODO add to constants? maybe change name or so
  * @param s
  * @param e
  */
-const dijkstras = (graph: NodeGraph, s: Point, e: Point) => {
-  // create min priority queue of distances
-  const pq = new PQ((a: NodeData, b: NodeData) => b.dist - a.dist);
+const aStar = (graph: NodeGraph, s: Point, e: Point) => {
+  // using Manhattan distance as heuristic function
+  const h = (p: Point) => Math.abs(p.x - e.x) + Math.abs(p.y - e.y);
+
+  // create min priority queue of costs
+  const pq = new PQ((a: NodeData, b: NodeData) => {
+    const aPoint = { x: b.x, y: b.y };
+    const bPoint = { x: a.x, y: a.y };
+    return b.dist * h(aPoint) - a.dist * h(bPoint);
+  });
 
   // set start node distance to 0 and enqueue it
   graph[s.x][s.y].dist = 0;
@@ -97,15 +103,15 @@ const solve = (
   // handle the bridge node
   if (bridgeNode) {
     // solve from start to bridge and bridge to end
-    const bridgeSol = dijkstras(graphCopy(), s, bridgeNode);
-    const endSol = dijkstras(graphCopy(), bridgeNode, e);
+    const bridgeSol = aStar(graphCopy(), s, bridgeNode);
+    const endSol = aStar(graphCopy(), bridgeNode, e);
 
     // combine solutions and return them
     const nodesVisited = bridgeSol.nodesVisited.concat(endSol.nodesVisited);
     const nodesTaken = bridgeSol.nodesTaken.concat(endSol.nodesTaken);
     return { nodesVisited, nodesTaken };
   }
-  return dijkstras(graphCopy(), s, e);
+  return aStar(graphCopy(), s, e);
 };
 
 export default { solve };
