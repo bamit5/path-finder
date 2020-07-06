@@ -3,10 +3,11 @@ button {
   padding: 1vh 3vh !important;
   border: none !important;
   margin: 0vh 1vh !important;
-  background-color: lightgrey;
+  background-color: lightgrey !important;
+  color: black !important;
 
   &:hover {
-    background-color: darken(lightgrey, 20%);
+    background-color: darken(lightgrey, 20%) !important;
   }
 }
 

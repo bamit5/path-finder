@@ -5,13 +5,15 @@ $color-emphasis: 20%;
 $node-regular-types:
   "inactive" white,
   "wall" black,
-  "start" aquamarine,
-  "end" aqua,
+  "start" #83e0c1,
+  "end" #f79cee,
   "bridge" burlywood;
 
 $node-path-types:
-  "visited" lightcoral,
-  "taken" turquoise;
+  "visited-first" #17955b,
+  "visited-second" #b43ca4,
+  "taken-first" #01256f,
+  "taken-second" #01256f;
 
 .graph-wrapper {
   display: flex;
@@ -81,21 +83,24 @@ $node-path-types:
   animation: search-pop-#{$type} 2s ease 0s forwards;
   @keyframes search-pop-#{$type} {
     0% {
-      padding: 25%;
+      padding: 40%;
       background-color: lightyellow;
+      border-radius: 25px;
+      border: 0px;
     }
 
     40% {
       padding: 0%;
-      transform: scale(1.1);
-      background-color: lighten($color: $color, $amount: $color-emphasis);
+      background-color: darken($color: $color, $amount: $color-emphasis);
+      border: 0px;
     }
 
     60% {
       padding: 0%;
-      transform: scale(1);
+      background-color: darken($color: $color, $amount: $color-emphasis);
+      transform: scale(1.1);
+      border: 0px;
     }
-
   }
 }
 
@@ -119,7 +124,7 @@ $node-path-types:
     @extend .node-basics;
     background-color: $color;
     @include search-pop($type, $color);
-    @if $type == "taken" {
+    @if $type == "taken-first" or $type == "taken-second" {
       border: 0px;
     }
   }

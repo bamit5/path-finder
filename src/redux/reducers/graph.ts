@@ -1,13 +1,11 @@
 import { AnyAction } from 'redux';
 import { List } from 'immutable';
-import { NodeData, Point, defaultNode } from '../../constants/constants';
+import { NodeData, defaultNode } from '../../constants/constants';
 import { GraphConstants } from '../constants';
 
 export interface GraphState {
-  startNode?: Point;
-  endNode?: Point;
-  bridgeNode?: Point;
   reset: boolean;
+  success: boolean;
 }
 
 // TODO delete
@@ -33,32 +31,12 @@ const initGraph = (width: number, height: number) /* TODO: Graph */ => {
 };
 
 const initialState: GraphState = {
-  startNode: undefined,
-  endNode: undefined,
-  bridgeNode: undefined,
   reset: true,
+  success: true,
 };
 
 const graph = (state = initialState, action: AnyAction) => {
   switch (action.type) {
-    case GraphConstants.SET_START_NODE:
-      return {
-        ...state,
-        startNode: action.message,
-      };
-
-    case GraphConstants.SET_END_NODE:
-      return {
-        ...state,
-        endNode: action.message,
-      };
-
-    case GraphConstants.SET_BRIDGE_NODE:
-      return {
-        ...state,
-        bridgeNode: action.message,
-      };
-
     case GraphConstants.RESET:
       return {
         ...state,
@@ -69,6 +47,12 @@ const graph = (state = initialState, action: AnyAction) => {
       return {
         ...state,
         reset: false,
+      };
+
+    case GraphConstants.SET_SUCCESS:
+      return {
+        ...state,
+        success: action.message,
       };
 
     default:

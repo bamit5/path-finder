@@ -13,7 +13,7 @@ type NodeGraph = NodeData[][]; // TODO add to constants? maybe change name or so
  * @param s
  * @param e
  */
-const dijkstras = (graph: NodeGraph, s: Point, e: Point) => {
+const bfs = (graph: NodeGraph, s: Point, e: Point) => {
   // create queue to keep track of nodes
   const q: NodeData[] = [];
 
@@ -66,7 +66,14 @@ const dijkstras = (graph: NodeGraph, s: Point, e: Point) => {
   if (cur) {
     // get the nodes taken in shortest path
     while (cur.prev != null) {
-      nodesTaken.unshift(cur);
+      // don't add to nodesTaken if it shouldn't be visualized as a taken node
+      if (
+        cur.type !== nodeStyles.START &&
+        cur.type !== nodeStyles.END &&
+        cur.type !== nodeStyles.BRIDGE
+      ) {
+        nodesTaken.unshift(cur);
+      }
       cur = cur.prev;
     }
   }
@@ -75,7 +82,6 @@ const dijkstras = (graph: NodeGraph, s: Point, e: Point) => {
   return { nodesVisited, nodesTaken };
 };
 
-// TODO set it up for multiple bridge nodes
 const solve = (
   types: string[][] /* TODO set this to be only node types */,
   s: Point,
@@ -91,15 +97,23 @@ const solve = (
   // handle the bridge node
   if (bridgeNode) {
     // solve from start to bridge and bridge to end
-    const bridgeSol = dijkstras(graphCopy(), s, bridgeNode);
-    const endSol = dijkstras(graphCopy(), bridgeNode, e);
+    const bridgeSol = bfs(graphCopy(), s, bridgeNode);
+    const endSol = bfs(graphCopy(), bridgeNode, e);
 
     // combine solutions and return them
-    const nodesVisited = bridgeSol.nodesVisited.concat(endSol.nodesVisited);
-    const nodesTaken = bridgeSol.nodesTaken.concat(endSol.nodesTaken);
-    return { nodesVisited, nodesTaken };
+    const nodesVisitedFirst = bridgeSol.nodesVisited;
+    const nodesVisitedSecond = endSol.nodesVisited;
+    const nodesTakenFirst = bridgeSol.nodesTaken;
+    const nodesTakenSecond = endSol.nodesTaken;
+    return {
+      nodesVisitedFirst,
+      nodesTakenFirst,
+      nodesVisitedSecond,
+      nodesTakenSecond,
+    };
   }
-  return dijkstras(graphCopy(), s, e);
+  const { nodesVisited, nodesTaken } = bfs(graphCopy(), s, e);
+  return { nodesVisitedFirst: nodesVisited, nodesTakenFirst: nodesTaken };
 };
 
 export default { solve };

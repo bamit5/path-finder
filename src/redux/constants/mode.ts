@@ -5,14 +5,11 @@ enum ModeConstants {
   VISUALIZING = 'VISUALIZING',
   COMPLETED = 'COMPLETED',
   // algorithm modes
-  SET_SOLVING_ALG = 'SET_SOLVING_ALGORITHM',
   BFS = 'BFS',
-  DIJKSTRAS = 'DIJKSTRAS',
-  A_STAR = 'A_STAR',
+  DIJKSTRAS = 'Dijkstras',
+  A_STAR = 'A*',
   // edit graph modes
   SETTING_WALL_NODES = 'wall-node',
-  SETTING_START_NODE = 'start-node',
-  SETTING_END_NODE = 'end-node',
   SETTING_BRIDGE_NODES = 'bridge-node',
 }
 
@@ -24,8 +21,6 @@ type Mode =
 
 type Node =
   | ModeConstants.SETTING_WALL_NODES
-  | ModeConstants.SETTING_START_NODE
-  | ModeConstants.SETTING_END_NODE
   | ModeConstants.SETTING_BRIDGE_NODES;
 
 type SolvingAlgorithm =

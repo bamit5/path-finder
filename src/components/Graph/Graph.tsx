@@ -17,9 +17,10 @@ import { RootState } from '../../redux/reducers';
 import graphActions from '../../redux/actions/graph';
 import { ModeConstants, ModeType, NodeType } from '../../redux/constants';
 import Dijkstras from '../../algorithms/Dijkstras';
-// import AStar from '../../algorithms/AStar';
-// import BFS from '../../algorithms/BFS';
+import AStar from '../../algorithms/AStar';
+import BFS from '../../algorithms/BFS';
 import modeActions from '../../redux/actions/mode';
+import { SolvingAlgorithmType } from '../../redux/constants/mode';
 
 interface GraphProps {
   width: number;
@@ -30,6 +31,7 @@ interface StateProps {
   mode: ModeType;
   settingNodeType: NodeType;
   reset: boolean;
+  alg: SolvingAlgorithmType;
 }
 
 interface DispatchProps {
@@ -44,6 +46,7 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
   mode,
   settingNodeType,
   reset,
+  alg,
   setMode,
   doneResetting,
   setGraphSuccess,
@@ -74,10 +77,10 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
   const [nodeRefs, setNodeRefs] = useState<RefObject<HTMLDivElement>[][]>(
     Array(width)
       .fill(null)
-      .map((_, x) =>
+      .map(() =>
         Array(height)
           .fill(null)
-          .map((__, y) => createRef<HTMLDivElement>()),
+          .map(() => createRef<HTMLDivElement>()),
       ),
   );
 
@@ -113,54 +116,113 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
       startNode.current &&
       endNode.current
     ) {
-      // solve with dijkstras // TODO change the algorithm type to be dynamic eventually
-      const { nodesVisited, nodesTaken } = Dijkstras.solve(
+      // find which algorithm to use for solving
+      let solve: Function;
+      switch (alg) {
+        case ModeConstants.BFS:
+          solve = BFS.solve;
+          break;
+
+        case ModeConstants.DIJKSTRAS:
+          solve = Dijkstras.solve;
+          break;
+
+        // A* algorithm
+        default:
+          solve = AStar.solve;
+      }
+      // solve with the user chosen algorithm
+      const {
+        nodesVisitedFirst,
+        nodesTakenFirst,
+        nodesVisitedSecond,
+        nodesTakenSecond,
+      } = solve(
         nodeRefs.map((row) =>
           row.map((ref) =>
             ref.current ? ref.current.className : nodeStyles.INACTIVE,
           ),
-        ), // TODO need to setup graph correctly in dijkstras! and change the file accordingly
+        ),
         startNode.current,
         endNode.current,
         bridgeNode.current || undefined,
       );
 
       // set graph success and begin visualizing
-      setGraphSuccess(nodesTaken.length > 0);
+      setGraphSuccess(
+        nodesTakenFirst.length > 0 &&
+          (!nodesTakenSecond || nodesTakenSecond.length > 0),
+      );
       setMode(ModeConstants.VISUALIZING);
 
-      // visualizing visited nodes
-      const speed = 30; // TODO dynamify
-      nodesVisited.forEach((node, i) => {
+      const speed = 20; // TODO dynamify
+      // visualize visited nodes
+      const nVFTotalTimeout = nodesVisitedFirst.length * speed;
+      nodesVisitedFirst.forEach((node, i) => {
         const ref = nodeRefs[node.x][node.y].current;
         if (ref) {
           setTimeout(() => {
-            ref.className = 'visited-node';
+            ref.className = 'visited-first-node';
           }, i * speed);
         }
       });
 
+      // if there was a bridge node, visualize visited from bridge node to end node
+      const nVSTotalTimeout = nodesVisitedSecond
+        ? nodesVisitedSecond.length * speed
+        : 0;
+      if (nodesVisitedSecond) {
+        nodesVisitedSecond.forEach((node, i) => {
+          const ref = nodeRefs[node.x][node.y].current;
+          if (ref) {
+            setTimeout(() => {
+              ref.className = 'visited-second-node';
+            }, nVFTotalTimeout + i * speed);
+          }
+        });
+      }
+
       // visualize taken nodes after visited nodes
-      nodesTaken.forEach((node, i) => {
+      const nTFTotalTimeout = nodesTakenFirst.length * speed;
+      nodesTakenFirst.forEach((node, i) => {
         const ref = nodeRefs[node.x][node.y].current;
         if (ref) {
           setTimeout(() => {
-            ref.className = 'taken-node';
-          }, nodesVisited.length * speed + i * speed);
+            ref.className = 'taken-first-node';
+          }, nVFTotalTimeout + nVSTotalTimeout + i * speed);
         }
       });
 
-      // graph is completed when done visualizing visited and taken nodes
+      // if there was a bridge node, visualize taken from bridge node to end node
+      const nTSTotalTimeout = nodesTakenSecond
+        ? nodesTakenSecond.length * speed
+        : 0;
+      if (nodesTakenSecond) {
+        nodesTakenSecond.forEach((node, i) => {
+          const ref = nodeRefs[node.x][node.y].current;
+          if (ref) {
+            setTimeout(() => {
+              ref.className = 'taken-second-node';
+            }, nVFTotalTimeout + nVSTotalTimeout + nTFTotalTimeout + i * speed);
+          }
+        });
+      }
+
+      // graph is completed when done visualizing all visited and taken nodes
       setTimeout(
         () => setMode(ModeConstants.COMPLETED),
-        nodesVisited.length * speed + nodesTaken.length * speed,
+        nVFTotalTimeout + nVSTotalTimeout + nTFTotalTimeout + nTSTotalTimeout,
       );
     }
   }, [mode]);
 
   useEffect(() => {
     // handle resetting
-    if (reset) {
+    if (
+      reset &&
+      mode !== ModeConstants.SOLVING &&
+      mode !== ModeConstants.VISUALIZING
+    ) {
       // reset graph styles
       nodeRefs.forEach((row) =>
         row.forEach((ref) => {
@@ -176,7 +238,10 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
       endNode.current = defaultEndNode();
       const rEndNode = nodeRefs[endNode.current.x][endNode.current.y];
       if (rEndNode.current) rEndNode.current.className = nodeStyles.END;
+      // reset bridge node
+      bridgeNode.current = null;
 
+      console.log('resetting the reset');
       doneResetting();
     }
   }, [reset]);
@@ -327,6 +392,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
   mode: state.mode.mode,
   settingNodeType: state.mode.settingNodeType,
   reset: state.graph.reset,
+  alg: state.mode.solvingAlg,
 });
 
 const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => ({

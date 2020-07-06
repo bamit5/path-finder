@@ -1,20 +1,4 @@
 import { GraphConstants } from '../constants';
-import { Point } from '../../constants/constants';
-
-const setStartNode = (startNode?: Point) => ({
-  type: GraphConstants.SET_START_NODE,
-  message: startNode,
-});
-
-const setEndNode = (endNode?: Point) => ({
-  type: GraphConstants.SET_END_NODE,
-  message: endNode,
-});
-
-const setBridgeNode = (bridgeNode?: Point) => ({
-  type: GraphConstants.SET_BRIDGE_NODE,
-  message: bridgeNode,
-});
 
 const resetGraph = () => ({
   type: GraphConstants.RESET,
@@ -30,9 +14,6 @@ const setSuccess = (success: boolean) => ({
 });
 
 const graphActions = {
-  setStartNode,
-  setEndNode,
-  setBridgeNode,
   resetGraph,
   doneResetting,
   setSuccess,

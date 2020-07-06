@@ -44,7 +44,3 @@ export const weights = {
   'end-node': 1,
   'bridge-node': 1,
 };
-
-export const Algorithms = {
-  DIJKSTRAS: 'DIJKSTRAS',
-};

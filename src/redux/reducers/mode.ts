@@ -1,19 +1,23 @@
 import { AnyAction } from 'redux';
 // TODO
 // eslint-disable-next-line sort-imports
-import { ModeConstants, ModeType, NodeType } from '../constants/index';
-import { Algorithms } from '../../constants/constants';
+import {
+  ModeConstants,
+  ModeType,
+  NodeType,
+  SolvingAlgorithmType,
+} from '../constants/index';
 
 export interface ModeState {
   mode: ModeType;
   settingNodeType: NodeType;
-  solvingAlg: string; // TODO change this to function type?
+  solvingAlg: SolvingAlgorithmType;
 }
 
 const initialState: ModeState = {
   mode: ModeConstants.EDITING,
   settingNodeType: ModeConstants.SETTING_WALL_NODES,
-  solvingAlg: Algorithms.DIJKSTRAS,
+  solvingAlg: ModeConstants.DIJKSTRAS,
 };
 
 const mode = (state = initialState, action: AnyAction) => {
@@ -42,22 +46,28 @@ const mode = (state = initialState, action: AnyAction) => {
         mode: ModeConstants.COMPLETED,
       };
 
+    case ModeConstants.BFS:
+      return {
+        ...state,
+        solvingAlg: ModeConstants.BFS,
+      };
+
+    case ModeConstants.DIJKSTRAS:
+      return {
+        ...state,
+        solvingAlg: ModeConstants.DIJKSTRAS,
+      };
+
+    case ModeConstants.A_STAR:
+      return {
+        ...state,
+        solvingAlg: ModeConstants.A_STAR,
+      };
+
     case ModeConstants.SETTING_WALL_NODES:
       return {
         ...state,
         settingNodeType: ModeConstants.SETTING_WALL_NODES,
-      };
-
-    case ModeConstants.SETTING_START_NODE:
-      return {
-        ...state,
-        settingNodeType: ModeConstants.SETTING_START_NODE,
-      };
-
-    case ModeConstants.SETTING_END_NODE:
-      return {
-        ...state,
-        settingNodeType: ModeConstants.SETTING_END_NODE,
       };
 
     case ModeConstants.SETTING_BRIDGE_NODES:

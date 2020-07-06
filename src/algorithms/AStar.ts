@@ -78,7 +78,14 @@ const aStar = (graph: NodeGraph, s: Point, e: Point) => {
   if (cur) {
     // get the nodes taken in shortest path
     while (cur.prev != null) {
-      nodesTaken.unshift(cur);
+      // don't add to nodesTaken if it shouldn't be visualized as a taken node
+      if (
+        cur.type !== nodeStyles.START &&
+        cur.type !== nodeStyles.END &&
+        cur.type !== nodeStyles.BRIDGE
+      ) {
+        nodesTaken.unshift(cur);
+      }
       cur = cur.prev;
     }
   }
@@ -87,7 +94,6 @@ const aStar = (graph: NodeGraph, s: Point, e: Point) => {
   return { nodesVisited, nodesTaken };
 };
 
-// TODO set it up for multiple bridge nodes
 const solve = (
   types: string[][] /* TODO set this to be only node types */,
   s: Point,
@@ -107,11 +113,19 @@ const solve = (
     const endSol = aStar(graphCopy(), bridgeNode, e);
 
     // combine solutions and return them
-    const nodesVisited = bridgeSol.nodesVisited.concat(endSol.nodesVisited);
-    const nodesTaken = bridgeSol.nodesTaken.concat(endSol.nodesTaken);
-    return { nodesVisited, nodesTaken };
+    const nodesVisitedFirst = bridgeSol.nodesVisited;
+    const nodesVisitedSecond = endSol.nodesVisited;
+    const nodesTakenFirst = bridgeSol.nodesTaken;
+    const nodesTakenSecond = endSol.nodesTaken;
+    return {
+      nodesVisitedFirst,
+      nodesTakenFirst,
+      nodesVisitedSecond,
+      nodesTakenSecond,
+    };
   }
-  return aStar(graphCopy(), s, e);
+  const { nodesVisited, nodesTaken } = aStar(graphCopy(), s, e);
+  return { nodesVisitedFirst: nodesVisited, nodesTakenFirst: nodesTaken };
 };
 
 export default { solve };
