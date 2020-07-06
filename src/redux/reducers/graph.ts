@@ -4,8 +4,9 @@ import { NodeData, Point, defaultNode } from '../../constants/constants';
 import { GraphConstants } from '../constants';
 
 export interface GraphState {
-  startNode: Point | null;
-  endNode: Point | null;
+  startNode?: Point;
+  endNode?: Point;
+  bridgeNode?: Point;
   reset: boolean;
 }
 
@@ -32,8 +33,9 @@ const initGraph = (width: number, height: number) /* TODO: Graph */ => {
 };
 
 const initialState: GraphState = {
-  startNode: null,
-  endNode: null,
+  startNode: undefined,
+  endNode: undefined,
+  bridgeNode: undefined,
   reset: false,
 };
 
@@ -49,6 +51,12 @@ const graph = (state = initialState, action: AnyAction) => {
       return {
         ...state,
         endNode: action.message,
+      };
+
+    case GraphConstants.SET_BRIDGE_NODE:
+      return {
+        ...state,
+        bridgeNode: action.message,
       };
 
     case GraphConstants.RESET:

@@ -10,14 +10,12 @@ import { Dispatch } from 'redux';
 // eslint-disable-next-line sort-imports
 import { RootState } from '../../redux/reducers';
 import modeActions from '../../redux/actions/mode';
-import { Point } from '../../constants/constants';
+
 import { ModeConstants, ModeType } from '../../redux/constants';
 import graphActions from '../../redux/actions/graph';
 
 interface StateProps {
   mode: ModeType;
-  startNode: Point | null;
-  endNode: Point | null;
 }
 
 interface DispatchProps {
@@ -31,8 +29,6 @@ interface DispatchProps {
 
 const CustomNavbar: React.FC<StateProps & DispatchProps> = ({
   mode,
-  startNode,
-  endNode,
   settingStartNode,
   settingEndNode,
   settingWallNodes,
@@ -61,7 +57,7 @@ const CustomNavbar: React.FC<StateProps & DispatchProps> = ({
           type="button"
           onClick={() => {
             // requirements before solving
-            if (startNode && endNode) {
+            if (mode === ModeConstants.EDITING) {
               // now in solving state
               setMode(ModeConstants.SOLVING);
             }
@@ -91,8 +87,6 @@ const CustomNavbar: React.FC<StateProps & DispatchProps> = ({
 
 const mapStateToProps = (state: RootState): StateProps => ({
   mode: state.mode.mode,
-  startNode: state.graph.startNode,
-  endNode: state.graph.endNode,
 });
 
 const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => ({
