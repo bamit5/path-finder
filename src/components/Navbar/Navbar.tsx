@@ -19,8 +19,6 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  settingStartNode: () => void;
-  settingEndNode: () => void;
   settingWallNodes: () => void;
   settingBridgeNodes: () => void;
   setMode: (mode: ModeType) => void;
@@ -29,8 +27,6 @@ interface DispatchProps {
 
 const CustomNavbar: React.FC<StateProps & DispatchProps> = ({
   mode,
-  settingStartNode,
-  settingEndNode,
   settingWallNodes,
   settingBridgeNodes,
   setMode,
@@ -41,12 +37,6 @@ const CustomNavbar: React.FC<StateProps & DispatchProps> = ({
     <Navbar.Toggle aria-controls="basic-nav-bar" />
     <Navbar.Collapse className="justify-content-end">
       <Nav className="controls">
-        <button type="button" onClick={() => settingStartNode()}>
-          Start Point
-        </button>
-        <button type="button" onClick={() => settingEndNode()}>
-          End Point
-        </button>
         <button type="button" onClick={() => settingWallNodes()}>
           Build Walls
         </button>
@@ -90,8 +80,6 @@ const mapStateToProps = (state: RootState): StateProps => ({
 });
 
 const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => ({
-  settingStartNode: () => dispatch(modeActions.settingStartNode()),
-  settingEndNode: () => dispatch(modeActions.settingEndNode()),
   settingWallNodes: () => dispatch(modeActions.settingWallNodes()),
   settingBridgeNodes: () => dispatch(modeActions.settingBridgeNodes()),
   setMode: (mode) => dispatch(modeActions.setMode(mode)),

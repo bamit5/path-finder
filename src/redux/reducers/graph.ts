@@ -36,7 +36,7 @@ const initialState: GraphState = {
   startNode: undefined,
   endNode: undefined,
   bridgeNode: undefined,
-  reset: false,
+  reset: true,
 };
 
 const graph = (state = initialState, action: AnyAction) => {

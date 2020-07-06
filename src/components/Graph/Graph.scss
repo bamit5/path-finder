@@ -108,6 +108,9 @@ $node-path-types:
     } @else {
       // TODO @include unpop($type, $color);
     }
+    @if $type == "wall" {
+      border: 0px;
+    }
   }
 }
 
@@ -116,5 +119,8 @@ $node-path-types:
     @extend .node-basics;
     background-color: $color;
     @include search-pop($type, $color);
+    @if $type == "taken" {
+      border: 0px;
+    }
   }
 }

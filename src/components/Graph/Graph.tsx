@@ -74,24 +74,29 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
   const [nodeRefs, setNodeRefs] = useState<RefObject<HTMLDivElement>[][]>(
     Array(width)
       .fill(null)
-      .map(() =>
+      .map((_, x) =>
         Array(height)
           .fill(null)
-          .map(() => createRef<HTMLDivElement>()),
+          .map((__, y) => createRef<HTMLDivElement>()),
       ),
   );
 
   // resizes graph, keeping previous values (if they exist)
   const resizeGraph = () => {
-    // create new graph
     setNodeRefs(
       Array(width)
         .fill(null)
-        .map(
-          (_, x) =>
-            Array(height)
-              .fill(null)
-              .map((__, y) => nodeRefs[x][y] || createRef<HTMLDivElement>()), // todo is there an error is x/y are out of bounds?
+        .map((_, x) =>
+          Array(height)
+            .fill(null)
+            .map(
+              (__, y) =>
+                // use previous value if it exists, otherwise create a new one
+                (x < nodeRefs.length &&
+                  y < nodeRefs[x].length &&
+                  nodeRefs[x][y]) ||
+                createRef<HTMLDivElement>(),
+            ),
         ),
     );
   };
@@ -163,9 +168,14 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
         }),
       );
 
-      // reset start/end Nodes
+      // reset start node
       startNode.current = defaultStartNode();
+      const rStartNode = nodeRefs[startNode.current.x][startNode.current.y];
+      if (rStartNode.current) rStartNode.current.className = nodeStyles.START;
+      // reset end node
       endNode.current = defaultEndNode();
+      const rEndNode = nodeRefs[endNode.current.x][endNode.current.y];
+      if (rEndNode.current) rEndNode.current.className = nodeStyles.END;
 
       doneResetting();
     }
@@ -285,7 +295,6 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
               }
               onMouseDown={async () => {
                 // update which type of node to drag on
-                console.log(ref.current ? ref.current.className : ref);
                 selectedType.current =
                   ref.current && ref.current.className !== nodeStyles.INACTIVE
                     ? ref.current.className
