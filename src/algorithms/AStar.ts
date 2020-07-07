@@ -17,13 +17,11 @@ type NodeGraph = NodeData[][]; // TODO add to constants? maybe change name or so
  */
 const aStar = (graph: NodeGraph, s: Point, e: Point) => {
   // using Manhattan distance as heuristic function
-  const h = (p: Point) => Math.abs(p.x - e.x) + Math.abs(p.y - e.y);
+  const h = ({ x, y }) => Math.abs(x - e.x) + Math.abs(y - e.y);
 
   // create min priority queue of costs
   const pq = new PQ((a: NodeData, b: NodeData) => {
-    const aPoint = { x: b.x, y: b.y };
-    const bPoint = { x: a.x, y: a.y };
-    return b.dist * h(aPoint) - a.dist * h(bPoint);
+    return b.cost - a.cost;
   });
 
   // set start node distance to 0 and enqueue it
@@ -37,7 +35,7 @@ const aStar = (graph: NodeGraph, s: Point, e: Point) => {
   const nodesTaken: NodeData[] = [];
 
   while (!pq.isEmpty()) {
-    // get node with shortest distance in priority queue
+    // get node with lest cost in priority queue
     const cur: NodeData = pq.deq();
 
     // if already visited, continue
@@ -63,12 +61,13 @@ const aStar = (graph: NodeGraph, s: Point, e: Point) => {
     if (cur.y > 0) neighbors.push(graph[cur.x][cur.y - 1]); // top neighbor
     if (cur.y < graph[0].length - 1) neighbors.push(graph[cur.x][cur.y + 1]); // bottom neighbor
 
-    neighbors.forEach((neighbor) => {
+    neighbors.forEach((n) => {
       // if there is a shorter path to neighbor through cur, update neighbor's dist/prev and insert it into pq
-      if (cur.dist + weights[neighbor.type] < neighbor.dist) {
-        neighbor.dist = cur.dist + weights[neighbor.type];
-        neighbor.prev = cur;
-        pq.enq(neighbor);
+      if (cur.dist + weights[n.type] < n.dist) {
+        n.dist = cur.dist + weights[n.type];
+        n.prev = cur;
+        n.cost = weights[n.type] + h(n);
+        pq.enq(n);
       }
     });
   }
@@ -103,7 +102,7 @@ const solve = (
   // create function that can create a new deep copy of correctly formatted graph
   const graphCopy = (): NodeGraph =>
     types.map((row, x) =>
-      row.map((type, y) => ({ ...defaultNode, type, x, y })),
+      row.map((type, y) => ({ ...defaultNode, type, x, y, cost: 0 })),
     );
 
   // handle the bridge node
