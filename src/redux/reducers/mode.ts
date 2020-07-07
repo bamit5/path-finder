@@ -17,7 +17,7 @@ export interface ModeState {
 const initialState: ModeState = {
   mode: ModeConstants.EDITING,
   settingNodeType: ModeConstants.SETTING_WALL_NODES,
-  solvingAlg: ModeConstants.DIJKSTRAS,
+  solvingAlg: ModeConstants.A_STAR,
 };
 
 const mode = (state = initialState, action: AnyAction) => {

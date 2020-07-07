@@ -12,8 +12,8 @@ $node-regular-types:
 $node-path-types:
   "visited-first" #17955b,
   "visited-second" #b43ca4,
-  "taken-first" #01256f,
-  "taken-second" #01256f;
+  "taken-first" #0043ca,
+  "taken-second" #0043ca;
 
 .graph-wrapper {
   display: flex;
@@ -80,7 +80,12 @@ $node-path-types:
 }
 // TODO add radius. try starting the pop with it being circular, then going to square
 @mixin search-pop($type, $color) {
-  animation: search-pop-#{$type} 2s ease 0s forwards;
+  @if $type == "taken-first" or $type == "taken-second" {
+    animation: search-bubble-out 2s infinite ease 0s forwards;
+  } @else {
+    animation: search-pop-#{$type} 2s ease 0s forwards;
+  }
+
   @keyframes search-pop-#{$type} {
     0% {
       padding: 40%;
@@ -100,6 +105,15 @@ $node-path-types:
       background-color: darken($color: $color, $amount: $color-emphasis);
       transform: scale(1.1);
       border: 0px;
+    }
+  }
+  @keyframes search-bubble-out {
+    40% {
+      background-color: darken($color: $color, $amount: $color-emphasis);
+    }
+
+    60% {
+      background-color: darken($color: $color, $amount: $color-emphasis);
     }
   }
 }
