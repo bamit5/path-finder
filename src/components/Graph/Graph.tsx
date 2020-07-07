@@ -4,7 +4,6 @@ import React, {
   createRef,
   useEffect,
   useRef,
-  useState,
 } from 'react';
 import { connect } from 'react-redux';
 
@@ -73,8 +72,8 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
   const endNode = useRef<Point>(defaultEndNode());
   const bridgeNode = useRef<Point | null>(null);
 
-  // used for animations
-  const [nodeRefs, setNodeRefs] = useState<RefObject<HTMLDivElement>[][]>(
+  // nodeRefs used for animations (not using useState because setState is async and not awaitable)
+  const nodeRefs = useRef<RefObject<HTMLDivElement>[][]>(
     Array(width)
       .fill(null)
       .map(() =>
@@ -83,6 +82,53 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
           .map(() => createRef<HTMLDivElement>()),
       ),
   );
+  // gets the nodeRefs
+  const getNodeRefs = () => nodeRefs.current;
+  // sets the nodeRefs
+  const setNodeRefs = (newNodeRefs: RefObject<HTMLDivElement>[][]) => {
+    nodeRefs.current = newNodeRefs;
+  };
+  const getNodeRef = (p: Point) => getNodeRefs()[p.x][p.y].current;
+
+  // functions to get current start/end/bridge node
+  const getStartRef = () => getNodeRef(startNode.current);
+  const getEndRef = () => getNodeRef(endNode.current);
+  const getBridgeRef = () =>
+    bridgeNode.current ? getNodeRef(bridgeNode.current) : null;
+
+  // functions to set new start/end/bridge nodes (also updates the pre/new ref's)
+  const setStartNode = (p: Point) => {
+    // reset previous start node
+    let startRef = getStartRef();
+    if (startRef) startRef.className = nodeStyles.INACTIVE;
+
+    // make new start node
+    startNode.current = p;
+    startRef = getStartRef();
+    if (startRef) startRef.className = nodeStyles.START;
+  };
+
+  const setEndNode = (p: Point) => {
+    // reset previous end node
+    let endRef = getEndRef();
+    if (endRef) endRef.className = nodeStyles.INACTIVE;
+
+    // make new end node
+    endNode.current = p;
+    endRef = getEndRef();
+    if (endRef) endRef.className = nodeStyles.END;
+  };
+
+  const setBridgeNode = (p: Point | null) => {
+    // reset previous bridge node
+    let bridgeRef = getBridgeRef();
+    if (bridgeRef) bridgeRef.className = nodeStyles.INACTIVE;
+
+    // make new bridge node
+    bridgeNode.current = p;
+    bridgeRef = getBridgeRef();
+    if (bridgeRef) bridgeRef.className = nodeStyles.BRIDGE;
+  };
 
   // resizes graph, keeping previous values (if they exist)
   const resizeGraph = () => {
@@ -95,9 +141,9 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
             .map(
               (__, y) =>
                 // use previous value if it exists, otherwise create a new one
-                (x < nodeRefs.length &&
-                  y < nodeRefs[x].length &&
-                  nodeRefs[x][y]) ||
+                (x < getNodeRefs().length &&
+                  y < getNodeRefs()[x].length &&
+                  getNodeRefs()[x][y]) ||
                 createRef<HTMLDivElement>(),
             ),
         ),
@@ -107,15 +153,16 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
   useEffect(() => {
     // resize graph whenever width or height changes
     resizeGraph();
+
+    // reset start/end/bridge node
+    setStartNode(defaultStartNode());
+    setEndNode(defaultEndNode());
+    setBridgeNode(null);
   }, [width, height]);
 
   useEffect(() => {
     // handle solving and visualzing
-    if (
-      mode === ModeConstants.SOLVING &&
-      startNode.current &&
-      endNode.current
-    ) {
+    if (mode === ModeConstants.SOLVING) {
       // find which algorithm to use for solving
       let solve: Function;
       switch (alg) {
@@ -127,10 +174,11 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
           solve = Dijkstras.solve;
           break;
 
-        // A* algorithm
+        // A* algorithm is default
         default:
           solve = AStar.solve;
       }
+
       // solve with the user chosen algorithm
       const {
         nodesVisitedFirst,
@@ -138,7 +186,7 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
         nodesVisitedSecond,
         nodesTakenSecond,
       } = solve(
-        nodeRefs.map((row) =>
+        getNodeRefs().map((row) =>
           row.map((ref) =>
             ref.current ? ref.current.className : nodeStyles.INACTIVE,
           ),
@@ -159,7 +207,7 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
       // visualize visited nodes
       const nVFTotalTimeout = nodesVisitedFirst.length * speed;
       nodesVisitedFirst.forEach((node, i) => {
-        const ref = nodeRefs[node.x][node.y].current;
+        const ref = getNodeRef({ x: node.x, y: node.y });
         if (ref) {
           setTimeout(() => {
             ref.className = 'visited-first-node';
@@ -173,7 +221,7 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
         : 0;
       if (nodesVisitedSecond) {
         nodesVisitedSecond.forEach((node, i) => {
-          const ref = nodeRefs[node.x][node.y].current;
+          const ref = getNodeRef({ x: node.x, y: node.y });
           if (ref) {
             setTimeout(() => {
               ref.className = 'visited-second-node';
@@ -185,7 +233,7 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
       // visualize taken nodes after visited nodes
       const nTFTotalTimeout = nodesTakenFirst.length * speed;
       nodesTakenFirst.forEach((node, i) => {
-        const ref = nodeRefs[node.x][node.y].current;
+        const ref = getNodeRef({ x: node.x, y: node.y });
         if (ref) {
           setTimeout(() => {
             ref.className = 'taken-first-node';
@@ -199,7 +247,7 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
         : 0;
       if (nodesTakenSecond) {
         nodesTakenSecond.forEach((node, i) => {
-          const ref = nodeRefs[node.x][node.y].current;
+          const ref = getNodeRef({ x: node.x, y: node.y });
           if (ref) {
             setTimeout(() => {
               ref.className = 'taken-second-node';
@@ -214,7 +262,7 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
         nVFTotalTimeout + nVSTotalTimeout + nTFTotalTimeout + nTSTotalTimeout,
       );
     }
-  }, [mode]);
+  }, [mode]); // TODO change this function with the new functions
 
   useEffect(() => {
     // handle resetting
@@ -224,118 +272,79 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
       mode !== ModeConstants.VISUALIZING
     ) {
       // reset graph styles
-      nodeRefs.forEach((row) =>
+      getNodeRefs().forEach((row) =>
         row.forEach((ref) => {
           if (ref.current) ref.current.className = nodeStyles.INACTIVE;
         }),
       );
 
-      // reset start node
-      startNode.current = defaultStartNode();
-      const rStartNode = nodeRefs[startNode.current.x][startNode.current.y];
-      if (rStartNode.current) rStartNode.current.className = nodeStyles.START;
-      // reset end node
-      endNode.current = defaultEndNode();
-      const rEndNode = nodeRefs[endNode.current.x][endNode.current.y];
-      if (rEndNode.current) rEndNode.current.className = nodeStyles.END;
-      // reset bridge node
-      bridgeNode.current = null;
+      // reset start/end/bridge node
+      setStartNode(defaultStartNode());
+      setEndNode(defaultEndNode());
+      setBridgeNode(null);
 
-      console.log('resetting the reset');
       doneResetting();
     }
   }, [reset]);
 
-  // TODO
-  const isChangeableNode = (x, y) =>
-    !(
-      _.isEqual({ x, y }, startNode.current) ||
-      _.isEqual({ x, y }, endNode.current) ||
-      _.isEqual({ x, y }, bridgeNode.current)
-    );
-
-  const handleClick = (
-    ref: RefObject<HTMLDivElement>,
-    x: number,
-    y: number,
-  ) => {
+  const handleClick = (ref: RefObject<HTMLDivElement>, point: Point) => {
     // only update style if the mode allows for user changes and the clicked node has a ref
     if (mode === ModeConstants.EDITING && ref.current) {
       switch (selectedType.current) {
-        case nodeStyles.START: {
-          // clicked node needs to change and start node's ref must exist
-          const rStartNode = nodeRefs[startNode.current.x][startNode.current.y];
-          if (!isChangeableNode(x, y) || !rStartNode.current) break;
-
-          // revert style of previous start node
-          rStartNode.current.className = nodeStyles.INACTIVE; // TODO add a previous to keep track of the previous style
-
-          // set new start node
-          ref.current.className = nodeStyles.START;
-          startNode.current = { x, y };
-          break;
-        }
-
-        case nodeStyles.END: {
-          // clicked node needs to change and end node's ref must exist
-          const rEndNode = nodeRefs[endNode.current.x][endNode.current.y];
-          if (!isChangeableNode(x, y) || !rEndNode.current) break;
-
-          // revert style of previous end node
-          rEndNode.current.className = nodeStyles.INACTIVE; // TODO add a previous to keep track of the previous style
-
-          // set new end node
-          ref.current.className = nodeStyles.END;
-          endNode.current = { x, y };
-          break;
-        }
-
-        case nodeStyles.BRIDGE: {
-          // clicked node cannot be start or end node
+        case nodeStyles.START:
+          // if clicked node can change, set it to start node
           if (
-            _.isEqual({ x, y }, startNode.current) ||
-            _.isEqual({ x, y }, endNode.current)
+            !(
+              _.isEqual(point, startNode.current) ||
+              _.isEqual(point, endNode.current) ||
+              _.isEqual(point, bridgeNode.current)
+            )
           )
-            break;
+            setStartNode(point);
+          break;
 
-          if (!bridgeNode.current) {
-            // if bridge node doesn't exist yet, then set clicked node to the bridge node
-            ref.current.className = nodeStyles.BRIDGE;
-            bridgeNode.current = { x, y };
-          } else {
-            // bridge node's ref must exist
-            const rBridgeNode =
-              nodeRefs[bridgeNode.current.x][bridgeNode.current.y];
-            if (!rBridgeNode || !rBridgeNode.current) break;
+        case nodeStyles.END:
+          // if clicked node can change, set it to end node
+          if (
+            !(
+              _.isEqual(point, startNode.current) ||
+              _.isEqual(point, endNode.current) ||
+              _.isEqual(point, bridgeNode.current)
+            )
+          )
+            setEndNode(point);
+          break;
 
-            // revert style of previous bridge node
-            rBridgeNode.current.className = nodeStyles.INACTIVE;
-
+        case nodeStyles.BRIDGE:
+          // clicked node cannot be start or end node (but it can be bridge node)
+          if (
+            !(
+              _.isEqual(point, startNode.current) ||
+              _.isEqual(point, endNode.current)
+            )
+          ) {
             // either set clicked node to bridge node or inactive (if it was previously bridge node)
-            if (_.isEqual({ x, y }, bridgeNode.current)) {
-              rBridgeNode.current.className = nodeStyles.INACTIVE;
-              bridgeNode.current = null;
-            } else {
-              rBridgeNode.current.className = nodeStyles.INACTIVE;
-              ref.current.className = nodeStyles.BRIDGE;
-              bridgeNode.current = { x, y };
-            }
+            setBridgeNode(_.isEqual(point, bridgeNode.current) ? null : point);
           }
           break;
-        }
 
         // wall node case
-        default: {
-          // clicked node needs to change
-          if (!isChangeableNode(x, y)) break;
-
-          // set to inactive if it was already a wall, otherwise set it to a wall
-          ref.current.className =
-            ref.current.className === nodeStyles.INACTIVE
-              ? nodeStyles.WALL
-              : nodeStyles.INACTIVE;
+        default:
+          // check if clicked node can change
+          if (
+            !(
+              _.isEqual(point, startNode.current) ||
+              _.isEqual(point, endNode.current) ||
+              _.isEqual(point, bridgeNode.current)
+            )
+          ) {
+            // set to inactive if it was already a wall, otherwise set it to a wall
+            ref.current.className =
+              ref.current.className === nodeStyles.INACTIVE
+                ? nodeStyles.WALL
+                : nodeStyles.INACTIVE;
+          }
           break;
-        }
       }
     }
   };
@@ -346,7 +355,7 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
       aria-label="Graph that contains the nodes"
       className="graph-wrapper"
     >
-      {nodeRefs.map((row, x) => (
+      {getNodeRefs().map((row, x) => (
         <div>
           {row.map((ref, y) => (
             // create a node for each index in the 2d array
@@ -356,7 +365,7 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
               tabIndex={0}
               ref={ref}
               className={
-                (ref.current && ref.current.className) || nodeStyles.INACTIVE // TODO
+                (ref.current && ref.current.className) || nodeStyles.INACTIVE
               }
               onMouseDown={async () => {
                 // update which type of node to drag on
@@ -364,7 +373,7 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
                   ref.current && ref.current.className !== nodeStyles.INACTIVE
                     ? ref.current.className
                     : settingNodeType;
-                handleClick(ref, x, y);
+                handleClick(ref, { x, y });
               }}
               onMouseUp={async () => {
                 // turn off dragging
@@ -372,12 +381,12 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
               }}
               onMouseEnter={async () => {
                 // when dragging into a node
-                if (selectedType.current) handleClick(ref, x, y);
+                if (selectedType.current) handleClick(ref, { x, y });
               }}
               onKeyPress={async (e) => {
                 if (e.key === ENTER || e.key === SPACE) {
                   selectedType.current = null;
-                  handleClick(ref, x, y);
+                  handleClick(ref, { x, y });
                 }
               }}
             />

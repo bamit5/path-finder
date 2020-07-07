@@ -6,15 +6,20 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 // TODO
-
-// TODO
 // eslint-disable-next-line sort-imports
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGithub } from '@fortawesome/free-brands-svg-icons';
+import { faQuestionCircle } from '@fortawesome/free-regular-svg-icons';
 import { RootState } from '../../redux/reducers';
 import modeActions from '../../redux/actions/mode';
 
 import { ModeConstants, ModeType } from '../../redux/constants';
 import graphActions from '../../redux/actions/graph';
 import { SolvingAlgorithmType } from '../../redux/constants/mode';
+
+interface NavbarProps {
+  showInstructions: (show: boolean) => void;
+}
 
 interface StateProps {
   mode: ModeType;
@@ -29,7 +34,8 @@ interface DispatchProps {
   resetGraph: () => void;
 }
 
-const CustomNavbar: React.FC<StateProps & DispatchProps> = ({
+const CustomNavbar: React.FC<NavbarProps & StateProps & DispatchProps> = ({
+  showInstructions,
   mode,
   algorithm,
   settingWallNodes,
@@ -39,7 +45,14 @@ const CustomNavbar: React.FC<StateProps & DispatchProps> = ({
   resetGraph,
 }) => (
   <Navbar collapseOnSelect bg="dark" variant="dark" expand="md">
-    <Navbar.Brand>Path Finder</Navbar.Brand>
+    <Navbar.Brand>
+      Path Finder
+      <FontAwesomeIcon
+        icon={faQuestionCircle}
+        onClick={() => showInstructions(true)}
+        className="question-icon"
+      />
+    </Navbar.Brand>
     <Navbar.Toggle aria-controls="basic-nav-bar" />
     <Navbar.Collapse className="justify-content-end">
       <Nav className="controls">
@@ -47,7 +60,7 @@ const CustomNavbar: React.FC<StateProps & DispatchProps> = ({
           Build Walls
         </button>
         <button type="button" onClick={() => settingBridgeNodes()}>
-          Build Bridges
+          Build Bridge
         </button>
         <Dropdown id="navbarDropdownTest">
           <Dropdown.Toggle id="algorithm-dropdown">{algorithm}</Dropdown.Toggle>
@@ -92,6 +105,13 @@ const CustomNavbar: React.FC<StateProps & DispatchProps> = ({
         >
           Reset
         </button>
+        <Nav.Link
+          href="https://github.com/bamit5/path-finder"
+          target="_blank"
+          className="github-wrapper"
+        >
+          <FontAwesomeIcon icon={faGithub} size="2x" />
+        </Nav.Link>
       </Nav>
     </Navbar.Collapse>
   </Navbar>

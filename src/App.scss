@@ -1,6 +1,39 @@
 .App {
 }
 
+.instructions-modal {
+  
+}
+
+.instructions-text {
+  padding: 2vh 10vh !important;
+  text-align: center !important;
+
+  button {
+    margin: 1vh !important;
+    background-color: lightgrey !important;
+  }
+}
+
+.instructions-q {
+  color: #17955b;
+  font-size: x-large;
+  padding: 2vh 0vh 1vh 0vh;
+  margin: 0vh;
+}
+
+.instructions-a {
+  font-size: large;
+  padding: 0vh 0vh 0.5vh 0vh;
+  margin: 0vh;
+}
+
+.instructions-note {
+  font-size: small;
+  padding: 0vh;
+  margin: 0vh;
+}
+
 /*
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {

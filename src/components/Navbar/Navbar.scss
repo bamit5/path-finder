@@ -1,34 +1,37 @@
+$color: lightgrey;
+$color-emphasis: 20%;
+
 button {
   border-radius: 5vh !important;
   padding: 1vh 3vh !important;
   border: none !important;
   margin: 0vh 1vh !important;
-  background-color: lightgrey !important;
+  background-color: $color !important;
   color: black !important;
 
   &:hover {
-    background-color: darken(lightgrey, 20%) !important;
+    background-color: darken($color, $color-emphasis) !important;
   }
 }
 
-/* TODO
-.navbar {
-  position: relative;
-  width: 100%;
-  height: 8vh;
-  background-color: cornflowerblue;
+.question-icon {
+  cursor: pointer !important;
+  margin: 0vh 2vh;
 
-  button {
-    width: auto;
-    height: 75%;
-    float: right;
-  }
-
-  .float-right {
-    display: flex;
-    position: relative;
-    justify-content: center;
-    height: 100%;
+  &:hover {
+    color: darken($color, $color-emphasis) !important;
   }
 }
-*/
+
+.github-wrapper {
+  color: $color !important;
+  padding: 0vh 0vh 0vh 1vh !important;
+
+  svg {
+    border-radius: 50% !important;
+
+    &:hover {
+      color: darken($color, $color-emphasis) !important;
+    }
+  }
+}
