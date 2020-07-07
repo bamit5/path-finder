@@ -16,6 +16,7 @@ const App = () => {
 
   return (
     <div className="App">
+      {/* TODO make an instructions component */}
       <Modal
         size="lg"
         show={show}

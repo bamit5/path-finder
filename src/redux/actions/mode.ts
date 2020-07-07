@@ -13,15 +13,15 @@ const settingWallNodes = () => ({
   type: ModeConstants.SETTING_WALL_NODES,
 });
 
-const settingBridgeNodes = () => ({
-  type: ModeConstants.SETTING_BRIDGE_NODES,
+const toggleBridgeNode = () => ({
+  type: ModeConstants.TOGGLE_BRIDGE_NODE,
 });
 
 const modeActions = {
   setMode,
   setSolvingAlg,
   settingWallNodes,
-  settingBridgeNodes,
+  toggleBridgeNode,
 };
 
 export default modeActions;

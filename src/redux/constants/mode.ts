@@ -10,7 +10,8 @@ enum ModeConstants {
   A_STAR = 'A*',
   // edit graph modes
   SETTING_WALL_NODES = 'wall-node',
-  SETTING_BRIDGE_NODES = 'bridge-node',
+  SETTING_WEIGHTED_NODES = 'weighted-node', // TODO
+  TOGGLE_BRIDGE_NODE = 'bridge-node',
 }
 
 type Mode =
@@ -19,9 +20,7 @@ type Mode =
   | ModeConstants.VISUALIZING
   | ModeConstants.COMPLETED;
 
-type Node =
-  | ModeConstants.SETTING_WALL_NODES
-  | ModeConstants.SETTING_BRIDGE_NODES;
+type Node = ModeConstants.SETTING_WALL_NODES | ModeConstants.TOGGLE_BRIDGE_NODE;
 
 type SolvingAlgorithm =
   | ModeConstants.BFS

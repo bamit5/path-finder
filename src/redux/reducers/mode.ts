@@ -12,12 +12,14 @@ export interface ModeState {
   mode: ModeType;
   settingNodeType: NodeType;
   solvingAlg: SolvingAlgorithmType;
+  bridgeNodeExists: boolean;
 }
 
 const initialState: ModeState = {
   mode: ModeConstants.EDITING,
   settingNodeType: ModeConstants.SETTING_WALL_NODES,
   solvingAlg: ModeConstants.A_STAR,
+  bridgeNodeExists: false,
 };
 
 const mode = (state = initialState, action: AnyAction) => {
@@ -70,10 +72,10 @@ const mode = (state = initialState, action: AnyAction) => {
         settingNodeType: ModeConstants.SETTING_WALL_NODES,
       };
 
-    case ModeConstants.SETTING_BRIDGE_NODES:
+    case ModeConstants.TOGGLE_BRIDGE_NODE:
       return {
         ...state,
-        settingNodeType: ModeConstants.SETTING_BRIDGE_NODES,
+        bridgeNodeExists: !state.bridgeNodeExists,
       };
 
     default:

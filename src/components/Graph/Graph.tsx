@@ -31,6 +31,7 @@ interface StateProps {
   settingNodeType: NodeType;
   reset: boolean;
   alg: SolvingAlgorithmType;
+  bridgeNodeExists: boolean;
 }
 
 interface DispatchProps {
@@ -46,6 +47,7 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
   settingNodeType,
   reset,
   alg,
+  bridgeNodeExists,
   setMode,
   doneResetting,
   setGraphSuccess,
@@ -57,13 +59,17 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
   // used for drag to select
   const selectedType = useRef<string | null>(null);
 
-  // default start and end node values
+  // default start/end/bridge node values
   const defaultStartNode = () => ({
     x: Math.floor(width / 4),
     y: Math.floor(height / 2),
   });
   const defaultEndNode = () => ({
     x: Math.floor((width * 3) / 4),
+    y: Math.floor(height / 2),
+  });
+  const defaultBridgeNode = () => ({
+    x: Math.floor(width / 2),
     y: Math.floor(height / 2),
   });
 
@@ -262,7 +268,7 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
         nVFTotalTimeout + nVSTotalTimeout + nTFTotalTimeout + nTSTotalTimeout,
       );
     }
-  }, [mode]); // TODO change this function with the new functions
+  }, [mode]);
 
   useEffect(() => {
     // handle resetting
@@ -287,57 +293,43 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
     }
   }, [reset]);
 
+  // handle adding/removing bridge node
+  useEffect(() => {
+    // if bridge node should exist, set bridge node to default state, otherwise null
+    setBridgeNode(bridgeNodeExists ? defaultBridgeNode() : null);
+  }, [bridgeNodeExists]);
+
+  // TODO
+  const isChangeableNode = (point: Point) =>
+    !(
+      _.isEqual(point, startNode.current) ||
+      _.isEqual(point, endNode.current) ||
+      _.isEqual(point, bridgeNode.current)
+    );
+
   const handleClick = (ref: RefObject<HTMLDivElement>, point: Point) => {
     // only update style if the mode allows for user changes and the clicked node has a ref
     if (mode === ModeConstants.EDITING && ref.current) {
       switch (selectedType.current) {
         case nodeStyles.START:
           // if clicked node can change, set it to start node
-          if (
-            !(
-              _.isEqual(point, startNode.current) ||
-              _.isEqual(point, endNode.current) ||
-              _.isEqual(point, bridgeNode.current)
-            )
-          )
-            setStartNode(point);
+          if (isChangeableNode(point)) setStartNode(point);
           break;
 
         case nodeStyles.END:
           // if clicked node can change, set it to end node
-          if (
-            !(
-              _.isEqual(point, startNode.current) ||
-              _.isEqual(point, endNode.current) ||
-              _.isEqual(point, bridgeNode.current)
-            )
-          )
-            setEndNode(point);
+          if (isChangeableNode(point)) setEndNode(point);
           break;
 
         case nodeStyles.BRIDGE:
           // clicked node cannot be start or end node (but it can be bridge node)
-          if (
-            !(
-              _.isEqual(point, startNode.current) ||
-              _.isEqual(point, endNode.current)
-            )
-          ) {
-            // either set clicked node to bridge node or inactive (if it was previously bridge node)
-            setBridgeNode(_.isEqual(point, bridgeNode.current) ? null : point);
-          }
+          if (isChangeableNode(point)) setBridgeNode(point);
           break;
 
         // wall node case
         default:
           // check if clicked node can change
-          if (
-            !(
-              _.isEqual(point, startNode.current) ||
-              _.isEqual(point, endNode.current) ||
-              _.isEqual(point, bridgeNode.current)
-            )
-          ) {
+          if (isChangeableNode(point)) {
             // set to inactive if it was already a wall, otherwise set it to a wall
             ref.current.className =
               ref.current.className === nodeStyles.INACTIVE
@@ -402,6 +394,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
   settingNodeType: state.mode.settingNodeType,
   reset: state.graph.reset,
   alg: state.mode.solvingAlg,
+  bridgeNodeExists: state.mode.bridgeNodeExists,
 });
 
 const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => ({

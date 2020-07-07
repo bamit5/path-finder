@@ -24,11 +24,12 @@ interface NavbarProps {
 interface StateProps {
   mode: ModeType;
   algorithm: SolvingAlgorithmType;
+  bridgeNodeExists: boolean;
 }
 
 interface DispatchProps {
   settingWallNodes: () => void;
-  settingBridgeNodes: () => void;
+  toggleBridgeNode: () => void;
   setMode: (mode: ModeType) => void;
   setAlgorithm: (alg: SolvingAlgorithmType) => void;
   resetGraph: () => void;
@@ -38,8 +39,9 @@ const CustomNavbar: React.FC<NavbarProps & StateProps & DispatchProps> = ({
   showInstructions,
   mode,
   algorithm,
+  bridgeNodeExists,
   settingWallNodes,
-  settingBridgeNodes,
+  toggleBridgeNode,
   setMode,
   setAlgorithm,
   resetGraph,
@@ -59,8 +61,11 @@ const CustomNavbar: React.FC<NavbarProps & StateProps & DispatchProps> = ({
         <button type="button" onClick={() => settingWallNodes()}>
           Build Walls
         </button>
-        <button type="button" onClick={() => settingBridgeNodes()}>
-          Build Bridge
+        <button
+          type="button"
+          onClick={() => mode === ModeConstants.EDITING && toggleBridgeNode()}
+        >
+          {bridgeNodeExists ? 'Remove Bridge' : 'Add Bridge'}
         </button>
         <Dropdown id="navbarDropdownTest">
           <Dropdown.Toggle id="algorithm-dropdown">{algorithm}</Dropdown.Toggle>
@@ -100,6 +105,9 @@ const CustomNavbar: React.FC<NavbarProps & StateProps & DispatchProps> = ({
               // now reseting
               resetGraph();
               setMode(ModeConstants.EDITING);
+
+              // check if need to reset add/remove bridge button
+              if (bridgeNodeExists) toggleBridgeNode();
             }
           }}
         >
@@ -118,13 +126,14 @@ const CustomNavbar: React.FC<NavbarProps & StateProps & DispatchProps> = ({
 );
 
 const mapStateToProps = (state: RootState): StateProps => ({
+  bridgeNodeExists: state.mode.bridgeNodeExists,
   mode: state.mode.mode,
   algorithm: state.mode.solvingAlg,
 });
 
 const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => ({
   settingWallNodes: () => dispatch(modeActions.settingWallNodes()),
-  settingBridgeNodes: () => dispatch(modeActions.settingBridgeNodes()),
+  toggleBridgeNode: () => dispatch(modeActions.toggleBridgeNode()),
   setMode: (mode) => dispatch(modeActions.setMode(mode)),
   setAlgorithm: (alg) => dispatch(modeActions.setSolvingAlg(alg)),
   resetGraph: () => dispatch(graphActions.resetGraph()),
