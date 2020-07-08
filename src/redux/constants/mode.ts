@@ -13,6 +13,12 @@ enum ModeConstants {
   BRICK_WALL = 'brick-wall-node',
   HAY_WALL = 'hay-wall-node',
   TOGGLE_BRIDGE_NODE = 'bridge-node',
+  // visualizing speed modes
+  SET_SPEED = 'SET_SPEED',
+  SLOW = 'Slow',
+  FAST = 'Fast',
+  FLASH = 'Flash',
+  IMMEDIATE = 'Immediate',
 }
 
 type Mode =
@@ -28,7 +34,14 @@ type SolvingAlgorithm =
   | ModeConstants.DIJKSTRAS
   | ModeConstants.A_STAR;
 
+type Speed =
+  | ModeConstants.SLOW
+  | ModeConstants.FAST
+  | ModeConstants.FLASH
+  | ModeConstants.IMMEDIATE;
+
 export { ModeConstants };
 export type ModeType = Mode;
 export type WallNodeType = WallNode;
 export type SolvingAlgorithmType = SolvingAlgorithm;
+export type SpeedType = Speed;

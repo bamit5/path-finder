@@ -62,7 +62,7 @@ const Introduction: React.FC<IntroductionProps> = ({ show, setShow }) => (
       <p className="instructions-a">
         1) Set up the graph by dragging around the{' '}
         <span className="start">start</span> and
-        <span className="end"> end</span> nodes, drawing{' '}
+        <span className="end"> end</span> nodes, building{' '}
         <img src={BrickWall} alt="Brick wall." className="wall-type-img" />{' '}
         brick and{' '}
         <img src={HayWall} alt="Hay wall." className="wall-type-img" /> hay
@@ -70,8 +70,8 @@ const Introduction: React.FC<IntroductionProps> = ({ show, setShow }) => (
         node.
       </p>
       <p className="instructions-note">
-        Draw brick or hay walls by selecting which wall from the navbar, and
-        then drag anywhere on the graph to draw it.
+        Build brick or hay walls by selecting which wall from the navbar, and
+        then drag anywhere on the graph to build it.
         <br />
         Click the "Add Bridge" button to add a bridge to the graph! Then drag
         wherever your heart desires.

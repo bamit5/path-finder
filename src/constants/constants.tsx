@@ -82,4 +82,11 @@ export const weights = {
   'hay-wall-node': 7,
 };
 
+export const Speed = {
+  Slow: 40,
+  Fast: 30,
+  Flash: 20,
+  Immediate: 0,
+};
+
 // TODO clean up this file

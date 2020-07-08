@@ -14,7 +14,12 @@ import _ from 'underscore';
 import { ENTER, Point, SPACE, nodeStyles } from '../../constants/constants';
 import { RootState } from '../../redux/reducers';
 import graphActions from '../../redux/actions/graph';
-import { ModeConstants, ModeType, WallNodeType } from '../../redux/constants';
+import {
+  ModeConstants,
+  ModeType,
+  SpeedType,
+  WallNodeType,
+} from '../../redux/constants';
 import Dijkstras from '../../algorithms/Dijkstras';
 import AStar from '../../algorithms/AStar';
 import BFS from '../../algorithms/BFS';
@@ -32,6 +37,7 @@ interface StateProps {
   reset: boolean;
   alg: SolvingAlgorithmType;
   bridgeNodeExists: boolean;
+  speedStr: SpeedType;
 }
 
 interface DispatchProps {
@@ -48,6 +54,7 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
   reset,
   alg,
   bridgeNodeExists,
+  speedStr,
   setMode,
   doneResetting,
   setGraphSuccess,
@@ -163,17 +170,26 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
 
   useEffect(() => {
     // if the algorithm changes to a non-weighted algorithm, then replace brick/hay nodes with regular wall nodes
-    if (mode === ModeConstants.EDITING && alg === ModeConstants.BFS) {
-      getNodeRefs().forEach((row) => {
-        row.forEach((ref) => {
-          if (
-            ref.current &&
-            (ref.current.className === nodeStyles.BRICK_WALL ||
-              ref.current.className === nodeStyles.HAY_WALL)
-          )
-            ref.current.className = nodeStyles.WALL;
+    if (mode === ModeConstants.EDITING) {
+      if (alg === ModeConstants.BFS) {
+        getNodeRefs().forEach((row) => {
+          row.forEach((ref) => {
+            if (
+              ref.current &&
+              (ref.current.className === nodeStyles.BRICK_WALL ||
+                ref.current.className === nodeStyles.HAY_WALL)
+            )
+              ref.current.className = nodeStyles.WALL;
+          });
         });
-      });
+      } else {
+        getNodeRefs().forEach((row) => {
+          row.forEach((ref) => {
+            if (ref.current && ref.current.className === nodeStyles.WALL)
+              ref.current.className = nodeStyles.BRICK_WALL;
+          });
+        });
+      }
     }
   }, [alg]);
 
@@ -220,15 +236,38 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
       );
       setMode(ModeConstants.VISUALIZING);
 
-      const speed = 20; // TODO dynamify
+      // get the speed of visualizing
+      let speed;
+      switch (speedStr) {
+        case ModeConstants.SLOW:
+          speed = 50; // TODO put in constants?
+          break;
+
+        case ModeConstants.FAST:
+          speed = 30;
+          break;
+
+        case ModeConstants.FLASH:
+          speed = 5;
+          break;
+
+        // immediate case is handled in maps (you shouldn't have any timeouts for immediate case)
+        default:
+          speed = 0;
+      }
+
       // visualize visited nodes
       const nVFTotalTimeout = nodesVisitedFirst.length * speed;
       nodesVisitedFirst.forEach((node, i) => {
         const ref = getNodeRef({ x: node.x, y: node.y });
         if (ref) {
-          setTimeout(() => {
+          if (speed === 0) {
             ref.className = 'visited-first-node';
-          }, i * speed);
+          } else {
+            setTimeout(() => {
+              ref.className = 'visited-first-node';
+            }, i * speed);
+          }
         }
       });
 
@@ -240,9 +279,13 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
         nodesVisitedSecond.forEach((node, i) => {
           const ref = getNodeRef({ x: node.x, y: node.y });
           if (ref) {
-            setTimeout(() => {
+            if (speed === 0) {
               ref.className = 'visited-second-node';
-            }, nVFTotalTimeout + i * speed);
+            } else {
+              setTimeout(() => {
+                ref.className = 'visited-second-node';
+              }, nVFTotalTimeout + i * speed);
+            }
           }
         });
       }
@@ -252,9 +295,13 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
       nodesTakenFirst.forEach((node, i) => {
         const ref = getNodeRef({ x: node.x, y: node.y });
         if (ref) {
-          setTimeout(() => {
+          if (speed === 0) {
             ref.className = 'taken-first-node';
-          }, nVFTotalTimeout + nVSTotalTimeout + i * speed);
+          } else {
+            setTimeout(() => {
+              ref.className = 'taken-first-node';
+            }, nVFTotalTimeout + nVSTotalTimeout + i * speed);
+          }
         }
       });
 
@@ -266,18 +313,26 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
         nodesTakenSecond.forEach((node, i) => {
           const ref = getNodeRef({ x: node.x, y: node.y });
           if (ref) {
-            setTimeout(() => {
+            if (speed === 0) {
               ref.className = 'taken-second-node';
-            }, nVFTotalTimeout + nVSTotalTimeout + nTFTotalTimeout + i * speed);
+            } else {
+              setTimeout(() => {
+                ref.className = 'taken-second-node';
+              }, nVFTotalTimeout + nVSTotalTimeout + nTFTotalTimeout + i * speed);
+            }
           }
         });
       }
 
       // graph is completed when done visualizing all visited and taken nodes
-      setTimeout(
-        () => setMode(ModeConstants.COMPLETED),
-        nVFTotalTimeout + nVSTotalTimeout + nTFTotalTimeout + nTSTotalTimeout,
-      );
+      if (speed === 0) {
+        setMode(ModeConstants.COMPLETED);
+      } else {
+        setTimeout(
+          () => setMode(ModeConstants.COMPLETED),
+          nVFTotalTimeout + nVSTotalTimeout + nTFTotalTimeout + nTSTotalTimeout,
+        );
+      }
     }
   }, [mode]);
 
@@ -409,6 +464,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
   reset: state.graph.reset,
   alg: state.mode.solvingAlg,
   bridgeNodeExists: state.mode.bridgeNodeExists,
+  speedStr: state.mode.speed,
 });
 
 const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => ({

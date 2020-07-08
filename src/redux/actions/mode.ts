@@ -2,6 +2,7 @@ import {
   ModeConstants,
   ModeType,
   SolvingAlgorithmType,
+  SpeedType,
   WallNodeType,
 } from '../constants';
 
@@ -22,11 +23,17 @@ const toggleBridgeNode = () => ({
   type: ModeConstants.TOGGLE_BRIDGE_NODE,
 });
 
+const setSpeed = (speed: SpeedType) => ({
+  type: ModeConstants.SET_SPEED,
+  message: speed,
+});
+
 const modeActions = {
   setMode,
   setSolvingAlg,
   setWallNodeType,
   toggleBridgeNode,
+  setSpeed,
 };
 
 export default modeActions;

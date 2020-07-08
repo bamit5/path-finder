@@ -8,11 +8,14 @@ import {
   WallNodeType,
 } from '../constants/index';
 
+import { SpeedType } from '../constants/mode';
+
 export interface ModeState {
   mode: ModeType;
   wallNodeType: WallNodeType;
   solvingAlg: SolvingAlgorithmType;
   bridgeNodeExists: boolean;
+  speed: SpeedType;
 }
 
 const initialState: ModeState = {
@@ -20,6 +23,7 @@ const initialState: ModeState = {
   wallNodeType: ModeConstants.BRICK_WALL,
   solvingAlg: ModeConstants.A_STAR,
   bridgeNodeExists: false,
+  speed: ModeConstants.FAST,
 };
 
 const mode = (state = initialState, action: AnyAction) => {
@@ -76,6 +80,12 @@ const mode = (state = initialState, action: AnyAction) => {
       return {
         ...state,
         bridgeNodeExists: !state.bridgeNodeExists,
+      };
+
+    case ModeConstants.SET_SPEED:
+      return {
+        ...state,
+        speed: action.message,
       };
 
     default:

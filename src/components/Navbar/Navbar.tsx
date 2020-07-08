@@ -15,7 +15,7 @@ import modeActions from '../../redux/actions/mode';
 
 import { ModeConstants, ModeType, WallNodeType } from '../../redux/constants';
 import graphActions from '../../redux/actions/graph';
-import { SolvingAlgorithmType } from '../../redux/constants/mode';
+import { SolvingAlgorithmType, SpeedType } from '../../redux/constants/mode';
 import BrickWall from '../../assets/BrickWall.png';
 import HayWall from '../../assets/HayWall.jpg';
 
@@ -28,6 +28,7 @@ interface StateProps {
   alg: SolvingAlgorithmType;
   bridgeNodeExists: boolean;
   wallNodeType: WallNodeType;
+  speed: SpeedType;
 }
 
 interface DispatchProps {
@@ -35,6 +36,7 @@ interface DispatchProps {
   toggleBridgeNode: () => void;
   setMode: (mode: ModeType) => void;
   setAlg: (alg: SolvingAlgorithmType) => void;
+  setSpeed: (speed: SpeedType) => void;
   resetGraph: () => void;
 }
 
@@ -44,10 +46,12 @@ const CustomNavbar: React.FC<NavbarProps & StateProps & DispatchProps> = ({
   alg,
   bridgeNodeExists,
   wallNodeType,
+  speed,
   setWallNodeType,
   toggleBridgeNode,
   setMode,
   setAlg,
+  setSpeed,
   resetGraph,
 }) => (
   <Navbar collapseOnSelect bg="dark" variant="dark" expand="md">
@@ -59,6 +63,9 @@ const CustomNavbar: React.FC<NavbarProps & StateProps & DispatchProps> = ({
         className="question-icon"
       />
     </Navbar.Brand>
+
+    <Navbar.Text>{mode}</Navbar.Text>
+
     <Navbar.Toggle aria-controls="basic-nav-bar" />
     <Navbar.Collapse className="justify-content-end">
       <Nav className="controls">
@@ -90,22 +97,24 @@ const CustomNavbar: React.FC<NavbarProps & StateProps & DispatchProps> = ({
                 <Dropdown.Item
                   onClick={() => setWallNodeType(ModeConstants.BRICK_WALL)}
                 >
+                  Build
                   <img
                     src={BrickWall}
                     alt="Click to choose to build a brick wall type."
                     className="building-wall-type-img"
                   />
-                  Brick
+                  Brick Walls
                 </Dropdown.Item>
                 <Dropdown.Item
                   onClick={() => setWallNodeType(ModeConstants.HAY_WALL)}
                 >
+                  Build
                   <img
                     src={HayWall}
                     alt="Click to choose to build a hay wall type."
                     className="building-wall-type-img"
                   />
-                  Hay
+                  Hay Walls
                 </Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
@@ -131,7 +140,7 @@ const CustomNavbar: React.FC<NavbarProps & StateProps & DispatchProps> = ({
               mode !== ModeConstants.EDITING
             }
           >
-            {alg}
+            Algorithm: {alg}
           </Dropdown.Toggle>
           <Dropdown.Menu>
             <Dropdown.Item onClick={() => setAlg(ModeConstants.BFS)}>
@@ -142,6 +151,32 @@ const CustomNavbar: React.FC<NavbarProps & StateProps & DispatchProps> = ({
             </Dropdown.Item>
             <Dropdown.Item onClick={() => setAlg(ModeConstants.A_STAR)}>
               {ModeConstants.A_STAR}
+            </Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
+
+        <Dropdown id="navbar-speed-dropdown">
+          <Dropdown.Toggle
+            id="speed-dropdown"
+            disabled={
+              // disable switching speed when not in editing mode
+              mode !== ModeConstants.EDITING
+            }
+          >
+            Speed: {speed}
+          </Dropdown.Toggle>
+          <Dropdown.Menu>
+            <Dropdown.Item onClick={() => setSpeed(ModeConstants.SLOW)}>
+              {ModeConstants.SLOW}
+            </Dropdown.Item>
+            <Dropdown.Item onClick={() => setSpeed(ModeConstants.FAST)}>
+              {ModeConstants.FAST}
+            </Dropdown.Item>
+            <Dropdown.Item onClick={() => setSpeed(ModeConstants.FLASH)}>
+              {ModeConstants.FLASH}
+            </Dropdown.Item>
+            <Dropdown.Item onClick={() => setSpeed(ModeConstants.IMMEDIATE)}>
+              {ModeConstants.IMMEDIATE}
             </Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
@@ -195,6 +230,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
   mode: state.mode.mode,
   alg: state.mode.solvingAlg,
   wallNodeType: state.mode.wallNodeType,
+  speed: state.mode.speed,
 });
 
 const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => ({
@@ -203,6 +239,7 @@ const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => ({
   toggleBridgeNode: () => dispatch(modeActions.toggleBridgeNode()),
   setMode: (mode) => dispatch(modeActions.setMode(mode)),
   setAlg: (alg) => dispatch(modeActions.setSolvingAlg(alg)),
+  setSpeed: (speed) => dispatch(modeActions.setSpeed(speed)),
   resetGraph: () => dispatch(graphActions.resetGraph()),
 });
 
