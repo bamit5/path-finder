@@ -1,3 +1,24 @@
+$color: lightgrey;
+$color-emphasis: 20%;
+$node-regular-types:
+  "inactive" white,
+  "wall" black,
+  "brick-wall" #00000000,
+  "hay-wall" #00000000,
+  "start" darken(#83e0c1, 30%),
+  "end" darken(#f79cee, 10%),
+  "bridge" darken(burlywood, 20%);
+
+$node-path-types:
+  "visited-first" #17955b,
+  "visited-second" #b43ca4,
+  "taken-first" #0043ca,
+  "taken-second" #0043ca;
+
+.instructions-header {
+  margin: 0vh;
+}
+
 .instructions-modal {
   
 }
@@ -9,6 +30,15 @@
   button {
     margin: 1vh !important;
     background-color: lightgrey !important;
+  color: black !important;
+  font-size: 1rem !important;
+  border-radius: 5vh !important;
+  padding: 1vh 3vh !important;
+  border: none !important;
+
+    &:hover {
+      background-color: darken($color, $color-emphasis) !important;
+    }
   }
 }
 
@@ -16,7 +46,7 @@
   color: #17955b;
   font-size: x-large;
   padding: 2vh 0vh 1vh 0vh;
-  margin: 0vh;
+  margin: 1vh 0vh 0vh 0vh;
 }
 
 .instructions-a {
@@ -28,5 +58,16 @@
 .instructions-note {
   font-size: small;
   padding: 0vh;
-  margin: 0vh;
+  margin: 0vh 0vh 1vh 0vh;
+}
+
+@each $type, $color in $node-regular-types {
+  .#{$type} {
+    color: $color;
+  }
+}
+
+.wall-type-img {
+  width: 4vh;
+  height: 4vh;
 }

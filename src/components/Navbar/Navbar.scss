@@ -8,9 +8,14 @@ button {
   margin: 0vh 1vh !important;
   background-color: $color !important;
   color: black !important;
+  font-size: 1rem !important;
 
   &:hover {
     background-color: darken($color, $color-emphasis) !important;
+  }
+
+  &:disabled {
+    background-color: darken($color, 2 * $color-emphasis) !important;
   }
 }
 

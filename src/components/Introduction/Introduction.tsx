@@ -2,6 +2,8 @@ import React from 'react';
 import Modal from 'react-bootstrap/Modal';
 import './Introduction.scss';
 import { connect } from 'react-redux';
+import BrickWall from '../../assets/BrickWall.png';
+import HayWall from '../../assets/HayWall.jpg';
 
 interface IntroductionProps {
   show: boolean;
@@ -17,37 +19,82 @@ const Introduction: React.FC<IntroductionProps> = ({ show, setShow }) => (
     className="instructions-modal"
   >
     <div className="instructions-text">
-      <h1>Welcome!</h1>
+      <h1 className="instructions-header">Welcome to Path Finder!</h1>
+
       <p className="instructions-q">What's a pathfinding algorithm?</p>
       <p className="instructions-a">
-        Simply an algorithm that tries to find the shortest path!
+        Simply an algorithm that tries to find the shortest path, normally
+        between a <span className="start">start</span> and
+        <span className="end"> end</span> node! This website helps visualize
+        pathfinder algorithms.
+      </p>
+
+      <p className="instructions-q">How does a pathfinding algorithm work?</p>
+      <p className="instructions-a">
+        Basically, each node has a "cost" of moving from one node to another,
+        and pathfinding algorithms try to reduce the total cost as much as
+        possible.
       </p>
       <p className="instructions-note">
-        In this graph, a movement from one node to another, unless specified
-        differently, has a "cost" of 1, and these algorithms try to reduce that
-        cost as much as possible.
-      </p>
-      <p className="instructions-q">How do I use this?</p>
-      <p className="instructions-a">1) Set up the graph.</p>
-      <p className="instructions-note">
-        Drag around the start (green) node and end (pink) node! Drag on the
-        graph to create walls (black) nodes. The pathfinding algorithms cannot
-        make a path through these walls.
+        Here, a movement from one node to a regular node has a cost of 1.
         <br />
-        Click the "Build Bridge" button so you can drag a bridge anywhere on the
-        graph!
+        If you want more in-depth explanations, check out the links next to the
+        algorithm names in the navbar.
       </p>
-      <p className="instructions-a">2) Pick an algorithm from the dropdown.</p>
+
+      <p className="instructions-q">What are walls and bridges?</p>
+      <p className="instructions-a">
+        There are 2 types of walls. A{' '}
+        <img src={BrickWall} alt="Brick wall." className="wall-type-img" />{' '}
+        brick wall is impassable. A{' '}
+        <img src={HayWall} alt="Hay wall." className="wall-type-img" /> hay wall
+        is passable, but requires extra cost.
+        <br />A <span className="bridge">bridge</span> node is a stopping point
+        where the path must cross to reach the end node.
+      </p>
       <p className="instructions-note">
-        Click on the dropdown and select an algorithm! Next to the algorithms
-        are links to sources that explain the algorithm.
+        Brick is too heavy to move, but hay is pretty light! Sometimes, it's
+        faster to move a hay wall then to walk around it.
       </p>
+
+      <p className="instructions-q">How do I use Path Finder?</p>
+
+      <p className="instructions-a">
+        1) Set up the graph by dragging around the{' '}
+        <span className="start">start</span> and
+        <span className="end"> end</span> nodes, drawing{' '}
+        <img src={BrickWall} alt="Brick wall." className="wall-type-img" />{' '}
+        brick and{' '}
+        <img src={HayWall} alt="Hay wall." className="wall-type-img" /> hay
+        walls, or adding and dragging a <span className="bridge">bridge</span>{' '}
+        node.
+      </p>
+      <p className="instructions-note">
+        Draw brick or hay walls by selecting which wall from the navbar, and
+        then drag anywhere on the graph to draw it.
+        <br />
+        Click the "Add Bridge" button to add a bridge to the graph! Then drag
+        wherever your heart desires.
+      </p>
+
+      <p className="instructions-a">
+        2) Pick an algorithm from the navbar dropdown.
+      </p>
+      <p className="instructions-note">
+        Next to the algorithms are links to sources that explain each algorithm
+        in detail.
+        <br />
+        Some algorithms cannot be used with weighted nodes (aka Hay nodes)!
+        These algorithms, such as Breadth First Search, will use plain black
+        walls instead of brick or hay walls.
+      </p>
+
       <p className="instructions-a">
         3) Click solve and watch the magic happen!
       </p>
+
       <p className="instructions-q">
-        If you need these instructions again, just click on the question icon
-        next to the path-finder logo!
+        Click on the question icon to see these explanations again.
       </p>
       <button type="button" onClick={() => setShow(false)}>
         Close

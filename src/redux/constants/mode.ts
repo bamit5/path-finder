@@ -5,9 +5,9 @@ enum ModeConstants {
   VISUALIZING = 'VISUALIZING',
   COMPLETED = 'COMPLETED',
   // algorithm modes
-  BFS = 'BFS',
-  DIJKSTRAS = 'Dijkstras',
-  A_STAR = 'A*',
+  BFS = 'Breadth First Search',
+  DIJKSTRAS = "Dijkstra's",
+  A_STAR = 'A Star',
   // edit graph modes
   SET_WALL_TYPE = 'SET_WALL_TYPE',
   BRICK_WALL = 'brick-wall-node',

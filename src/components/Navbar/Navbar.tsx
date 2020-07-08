@@ -62,61 +62,74 @@ const CustomNavbar: React.FC<NavbarProps & StateProps & DispatchProps> = ({
     <Navbar.Toggle aria-controls="basic-nav-bar" />
     <Navbar.Collapse className="justify-content-end">
       <Nav className="controls">
-        {/* only show the brick or hay dropdown if the algorithm can be weighted */}
-        {alg !== ModeConstants.BFS && (
-          <Dropdown id="navbar-wall-dropdown">
-            <Dropdown.Toggle
-              id="wall-dropdown"
-              disabled={mode !== ModeConstants.EDITING}
-            >
-              Building
-              <img
-                src={
-                  wallNodeType === ModeConstants.BRICK_WALL
-                    ? BrickWall
-                    : HayWall
+        {
+          // only show the brick or hay dropdown if the algorithm can be weighted
+          alg !== ModeConstants.BFS && (
+            <Dropdown id="navbar-wall-dropdown">
+              <Dropdown.Toggle
+                id="wall-dropdown"
+                disabled={
+                  // disable wall node type switch button when not in editing mode
+                  mode !== ModeConstants.EDITING
                 }
-                alt="The current wall node being built."
-                className="building-wall-type-img"
-              />
-              {wallNodeType === ModeConstants.BRICK_WALL ? 'Brick ' : 'Hay '}
-              Walls
-            </Dropdown.Toggle>
-            <Dropdown.Menu>
-              <Dropdown.Item
-                onClick={() => setWallNodeType(ModeConstants.BRICK_WALL)}
               >
+                Building
                 <img
-                  src={BrickWall}
-                  alt="Click to choose to build a brick wall type."
+                  src={
+                    wallNodeType === ModeConstants.BRICK_WALL
+                      ? BrickWall
+                      : HayWall
+                  }
+                  alt="The current wall node being built."
                   className="building-wall-type-img"
                 />
-                Brick
-              </Dropdown.Item>
-              <Dropdown.Item
-                onClick={() => setWallNodeType(ModeConstants.HAY_WALL)}
-              >
-                <img
-                  src={HayWall}
-                  alt="Click to choose to build a hay wall type."
-                  className="building-wall-type-img"
-                />
-                Hay
-              </Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
-        )}
+                {wallNodeType === ModeConstants.BRICK_WALL ? 'Brick ' : 'Hay '}
+                Walls
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                <Dropdown.Item
+                  onClick={() => setWallNodeType(ModeConstants.BRICK_WALL)}
+                >
+                  <img
+                    src={BrickWall}
+                    alt="Click to choose to build a brick wall type."
+                    className="building-wall-type-img"
+                  />
+                  Brick
+                </Dropdown.Item>
+                <Dropdown.Item
+                  onClick={() => setWallNodeType(ModeConstants.HAY_WALL)}
+                >
+                  <img
+                    src={HayWall}
+                    alt="Click to choose to build a hay wall type."
+                    className="building-wall-type-img"
+                  />
+                  Hay
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+          )
+        }
+
         <button
           type="button"
-          onClick={() => mode === ModeConstants.EDITING && toggleBridgeNode()}
-          disabled={mode !== ModeConstants.EDITING}
+          onClick={() => toggleBridgeNode()}
+          disabled={
+            // disable adding/removing a bridge mode when not in editing mode
+            mode !== ModeConstants.EDITING
+          }
         >
           {bridgeNodeExists ? 'Remove Bridge' : 'Add Bridge'}
         </button>
+
         <Dropdown id="navbar-algorithm-dropdown">
           <Dropdown.Toggle
             id="algorithm-dropdown"
-            disabled={mode !== ModeConstants.EDITING}
+            disabled={
+              // disable switching algorithm when not in editing mode
+              mode !== ModeConstants.EDITING
+            }
           >
             {alg}
           </Dropdown.Toggle>
@@ -132,41 +145,39 @@ const CustomNavbar: React.FC<NavbarProps & StateProps & DispatchProps> = ({
             </Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
+
         <button
           type="button"
-          disabled={mode !== ModeConstants.EDITING} // TODO doesnt seem to be working
           onClick={() => {
-            // requirements before solving
-            if (mode === ModeConstants.EDITING) {
-              // now in solving state
-              setMode(ModeConstants.SOLVING);
-            }
+            // now in solving state
+            setMode(ModeConstants.SOLVING);
           }}
+          disabled={
+            // disable solve when not in editing mode
+            mode !== ModeConstants.EDITING
+          }
         >
           Solve
         </button>
+
         <button
           type="button"
           onClick={() => {
-            if (
-              mode !== ModeConstants.SOLVING &&
-              mode !== ModeConstants.VISUALIZING
-            ) {
-              // now reseting
-              resetGraph();
-              setMode(ModeConstants.EDITING);
+            // now reseting
+            resetGraph();
+            setMode(ModeConstants.EDITING);
 
-              // check if need to reset "add/remove bridge" button
-              if (bridgeNodeExists) toggleBridgeNode();
-            }
+            // check if need to reset "add/remove bridge" button
+            if (bridgeNodeExists) toggleBridgeNode();
           }}
           disabled={
-            // TODO doesn't seem to be working???...
+            // disable reset when solving/visualizing
             mode === ModeConstants.SOLVING || mode === ModeConstants.VISUALIZING
           }
         >
           Reset
         </button>
+
         <Nav.Link
           href="https://github.com/bamit5/path-finder"
           target="_blank"

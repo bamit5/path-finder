@@ -136,8 +136,8 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
     if (bridgeRef) bridgeRef.className = nodeStyles.BRIDGE;
   };
 
-  // resizes graph, keeping previous values (if they exist)
-  const resizeGraph = () => {
+  useEffect(() => {
+    // resize graph whenever width or height changes, keeping possible previous values
     setNodeRefs(
       Array(width)
         .fill(null)
@@ -154,11 +154,6 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
             ),
         ),
     );
-  };
-
-  useEffect(() => {
-    // resize graph whenever width or height changes
-    resizeGraph();
 
     // reset start/end/bridge node
     setStartNode(defaultStartNode());

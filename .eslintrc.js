@@ -27,5 +27,6 @@ module.exports = {
     'no-plusplus': [2, { allowForLoopAfterthoughts: true }],
     "no-param-reassign": 0,
     "no-continue": 0,
+    "react/jsx-one-expression-per-line": 0,
   },
 };
