@@ -66,7 +66,7 @@ const aStar = (graph: NodeGraph, s: Point, e: Point) => {
       if (cur.dist + weights[n.type] < n.dist) {
         n.dist = cur.dist + weights[n.type];
         n.prev = cur;
-        n.cost = weights[n.type] + h(n);
+        n.cost = weights[n.type] + h(n); // TODO should i add or multiply these values
         pq.enq(n);
       }
     });

@@ -25,7 +25,7 @@ interface NavbarProps {
 
 interface StateProps {
   mode: ModeType;
-  algorithm: SolvingAlgorithmType;
+  alg: SolvingAlgorithmType;
   bridgeNodeExists: boolean;
   wallNodeType: WallNodeType;
 }
@@ -34,25 +34,20 @@ interface DispatchProps {
   setWallNodeType: (wallNodeType: WallNodeType) => void;
   toggleBridgeNode: () => void;
   setMode: (mode: ModeType) => void;
-  setAlgorithm: (alg: SolvingAlgorithmType) => void;
+  setAlg: (alg: SolvingAlgorithmType) => void;
   resetGraph: () => void;
 }
-
-const wallTypeToImg = {
-  'wall-brick-node': BrickWall,
-  'wall-hay-node': HayWall,
-};
 
 const CustomNavbar: React.FC<NavbarProps & StateProps & DispatchProps> = ({
   showInstructions,
   mode,
-  algorithm,
+  alg,
   bridgeNodeExists,
   wallNodeType,
   setWallNodeType,
   toggleBridgeNode,
   setMode,
-  setAlgorithm,
+  setAlg,
   resetGraph,
 }) => (
   <Navbar collapseOnSelect bg="dark" variant="dark" expand="md">
@@ -67,66 +62,79 @@ const CustomNavbar: React.FC<NavbarProps & StateProps & DispatchProps> = ({
     <Navbar.Toggle aria-controls="basic-nav-bar" />
     <Navbar.Collapse className="justify-content-end">
       <Nav className="controls">
-        <Dropdown id="navbar-wall-dropdown">
-          <Dropdown.Toggle id="wall-dropdown">
-            Building
-            <img
-              src={
-                wallNodeType === ModeConstants.BRICK_WALL ? BrickWall : HayWall
-              }
-              alt="The current wall node being built."
-              className="building-wall-type-img"
-            />
-            {wallNodeType === ModeConstants.BRICK_WALL ? 'Brick ' : 'Hay '}
-            Walls
-          </Dropdown.Toggle>
-          <Dropdown.Menu>
-            <Dropdown.Item
-              onClick={() => setWallNodeType(ModeConstants.BRICK_WALL)}
+        {/* only show the brick or hay dropdown if the algorithm can be weighted */}
+        {alg !== ModeConstants.BFS && (
+          <Dropdown id="navbar-wall-dropdown">
+            <Dropdown.Toggle
+              id="wall-dropdown"
+              disabled={mode !== ModeConstants.EDITING}
             >
+              Building
               <img
-                src={BrickWall}
-                alt="Click to choose to build a brick wall type."
+                src={
+                  wallNodeType === ModeConstants.BRICK_WALL
+                    ? BrickWall
+                    : HayWall
+                }
+                alt="The current wall node being built."
                 className="building-wall-type-img"
               />
-              Brick
-            </Dropdown.Item>
-            <Dropdown.Item
-              onClick={() => setWallNodeType(ModeConstants.HAY_WALL)}
-            >
-              <img
-                src={HayWall}
-                alt="Click to choose to build a hay wall type."
-                className="building-wall-type-img"
-              />
-              Hay
-            </Dropdown.Item>
-          </Dropdown.Menu>
-        </Dropdown>
+              {wallNodeType === ModeConstants.BRICK_WALL ? 'Brick ' : 'Hay '}
+              Walls
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              <Dropdown.Item
+                onClick={() => setWallNodeType(ModeConstants.BRICK_WALL)}
+              >
+                <img
+                  src={BrickWall}
+                  alt="Click to choose to build a brick wall type."
+                  className="building-wall-type-img"
+                />
+                Brick
+              </Dropdown.Item>
+              <Dropdown.Item
+                onClick={() => setWallNodeType(ModeConstants.HAY_WALL)}
+              >
+                <img
+                  src={HayWall}
+                  alt="Click to choose to build a hay wall type."
+                  className="building-wall-type-img"
+                />
+                Hay
+              </Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+        )}
         <button
           type="button"
           onClick={() => mode === ModeConstants.EDITING && toggleBridgeNode()}
+          disabled={mode !== ModeConstants.EDITING}
         >
           {bridgeNodeExists ? 'Remove Bridge' : 'Add Bridge'}
         </button>
         <Dropdown id="navbar-algorithm-dropdown">
-          <Dropdown.Toggle id="algorithm-dropdown">{algorithm}</Dropdown.Toggle>
+          <Dropdown.Toggle
+            id="algorithm-dropdown"
+            disabled={mode !== ModeConstants.EDITING}
+          >
+            {alg}
+          </Dropdown.Toggle>
           <Dropdown.Menu>
-            <Dropdown.Item onClick={() => setAlgorithm(ModeConstants.BFS)}>
+            <Dropdown.Item onClick={() => setAlg(ModeConstants.BFS)}>
               {ModeConstants.BFS}
             </Dropdown.Item>
-            <Dropdown.Item
-              onClick={() => setAlgorithm(ModeConstants.DIJKSTRAS)}
-            >
+            <Dropdown.Item onClick={() => setAlg(ModeConstants.DIJKSTRAS)}>
               {ModeConstants.DIJKSTRAS}
             </Dropdown.Item>
-            <Dropdown.Item onClick={() => setAlgorithm(ModeConstants.A_STAR)}>
+            <Dropdown.Item onClick={() => setAlg(ModeConstants.A_STAR)}>
               {ModeConstants.A_STAR}
             </Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
         <button
           type="button"
+          disabled={mode !== ModeConstants.EDITING} // TODO doesnt seem to be working
           onClick={() => {
             // requirements before solving
             if (mode === ModeConstants.EDITING) {
@@ -148,10 +156,14 @@ const CustomNavbar: React.FC<NavbarProps & StateProps & DispatchProps> = ({
               resetGraph();
               setMode(ModeConstants.EDITING);
 
-              // check if need to reset add/remove bridge button
+              // check if need to reset "add/remove bridge" button
               if (bridgeNodeExists) toggleBridgeNode();
             }
           }}
+          disabled={
+            // TODO doesn't seem to be working???...
+            mode === ModeConstants.SOLVING || mode === ModeConstants.VISUALIZING
+          }
         >
           Reset
         </button>
@@ -170,7 +182,7 @@ const CustomNavbar: React.FC<NavbarProps & StateProps & DispatchProps> = ({
 const mapStateToProps = (state: RootState): StateProps => ({
   bridgeNodeExists: state.mode.bridgeNodeExists,
   mode: state.mode.mode,
-  algorithm: state.mode.solvingAlg,
+  alg: state.mode.solvingAlg,
   wallNodeType: state.mode.wallNodeType,
 });
 
@@ -179,7 +191,7 @@ const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => ({
     dispatch(modeActions.setWallNodeType(wallNodeType)),
   toggleBridgeNode: () => dispatch(modeActions.toggleBridgeNode()),
   setMode: (mode) => dispatch(modeActions.setMode(mode)),
-  setAlgorithm: (alg) => dispatch(modeActions.setSolvingAlg(alg)),
+  setAlg: (alg) => dispatch(modeActions.setSolvingAlg(alg)),
   resetGraph: () => dispatch(graphActions.resetGraph()),
 });
 

@@ -52,10 +52,7 @@ const bfs = (graph: NodeGraph, s: Point, e: Point) => {
 
     neighbors.forEach((n) => {
       // if neighbor is unvisited and can be traversed
-      if (
-        n.dist === Number.POSITIVE_INFINITY &&
-        n.type !== nodeStyles.BRICK_WALL
-      ) {
+      if (n.dist === Number.POSITIVE_INFINITY && n.type !== nodeStyles.WALL) {
         // set dist, add previous, and push to the queue
         n.dist = cur.dist + 1;
         n.prev = cur;

@@ -27,9 +27,10 @@ export interface Point {
   y: number;
 }
 
+// TODO
 export const nodeStyles = {
   INACTIVE: 'inactive-node',
-  // WALL: 'wall-node', // TODO
+  WALL: 'wall-node',
   BRICK_WALL: 'brick-wall-node',
   HAY_WALL: 'hay-wall-node',
   START: 'start-node',
@@ -38,6 +39,17 @@ export const nodeStyles = {
   VISITED: 'visited-node',
   TAKEN: 'taken-node',
 };
+// export enum nodeStyles {
+//   INACTIVE = 'inactive-node',
+//   WALL = 'wall-node',
+//   BRICK_WALL = 'brick-wall-node',
+//   HAY_WALL = 'hay-wall-node',
+//   START = 'start-node',
+//   END = 'end-node',
+//   BRIDGE = 'bridge-node',
+//   VISITED = 'visited-node',
+//   TAKEN = 'taken-node',
+// }
 
 export const defaultNode: NodeData = {
   x: 0,
@@ -62,12 +74,12 @@ export const defaultNode: NodeData = {
 
 export const weights = {
   'inactive-node': 1,
-  'wall-node': Number.POSITIVE_INFINITY,
   'start-node': 1,
   'end-node': 1,
   'bridge-node': 1,
+  'wall-node': Number.POSITIVE_INFINITY,
   'brick-wall-node': Number.POSITIVE_INFINITY,
-  'hay-wall-node': 5,
+  'hay-wall-node': 10,
 };
 
 // TODO clean up this file

@@ -167,6 +167,22 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
   }, [width, height]);
 
   useEffect(() => {
+    // if the algorithm changes to a non-weighted algorithm, then replace brick/hay nodes with regular wall nodes
+    if (mode === ModeConstants.EDITING && alg === ModeConstants.BFS) {
+      getNodeRefs().forEach((row) => {
+        row.forEach((ref) => {
+          if (
+            ref.current &&
+            (ref.current.className === nodeStyles.BRICK_WALL ||
+              ref.current.className === nodeStyles.HAY_WALL)
+          )
+            ref.current.className = nodeStyles.WALL;
+        });
+      });
+    }
+  }, [alg]);
+
+  useEffect(() => {
     // handle solving and visualzing
     if (mode === ModeConstants.SOLVING) {
       // find which algorithm to use for solving
@@ -331,10 +347,13 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
           // check if clicked node can change
           if (isChangeableNode(point)) {
             // set to inactive if it was already a wall, otherwise set it to a wall
-            ref.current.className =
-              ref.current.className === nodeStyles.INACTIVE
-                ? wallNodeType
-                : nodeStyles.INACTIVE;
+            if (ref.current.className === nodeStyles.INACTIVE) {
+              // if chosen algorithm is non-weighted, use normal wall nodes
+              ref.current.className =
+                alg === ModeConstants.BFS ? nodeStyles.WALL : wallNodeType;
+            } else {
+              ref.current.className = nodeStyles.INACTIVE;
+            }
           }
           break;
       }
