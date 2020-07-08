@@ -13,9 +13,11 @@ import { faQuestionCircle } from '@fortawesome/free-regular-svg-icons';
 import { RootState } from '../../redux/reducers';
 import modeActions from '../../redux/actions/mode';
 
-import { ModeConstants, ModeType } from '../../redux/constants';
+import { ModeConstants, ModeType, WallNodeType } from '../../redux/constants';
 import graphActions from '../../redux/actions/graph';
 import { SolvingAlgorithmType } from '../../redux/constants/mode';
+import BrickWall from '../../assets/BrickWall.png';
+import HayWall from '../../assets/HayWall.jpg';
 
 interface NavbarProps {
   showInstructions: (show: boolean) => void;
@@ -25,22 +27,29 @@ interface StateProps {
   mode: ModeType;
   algorithm: SolvingAlgorithmType;
   bridgeNodeExists: boolean;
+  wallNodeType: WallNodeType;
 }
 
 interface DispatchProps {
-  settingWallNodes: () => void;
+  setWallNodeType: (wallNodeType: WallNodeType) => void;
   toggleBridgeNode: () => void;
   setMode: (mode: ModeType) => void;
   setAlgorithm: (alg: SolvingAlgorithmType) => void;
   resetGraph: () => void;
 }
 
+const wallTypeToImg = {
+  'wall-brick-node': BrickWall,
+  'wall-hay-node': HayWall,
+};
+
 const CustomNavbar: React.FC<NavbarProps & StateProps & DispatchProps> = ({
   showInstructions,
   mode,
   algorithm,
   bridgeNodeExists,
-  settingWallNodes,
+  wallNodeType,
+  setWallNodeType,
   toggleBridgeNode,
   setMode,
   setAlgorithm,
@@ -58,16 +67,49 @@ const CustomNavbar: React.FC<NavbarProps & StateProps & DispatchProps> = ({
     <Navbar.Toggle aria-controls="basic-nav-bar" />
     <Navbar.Collapse className="justify-content-end">
       <Nav className="controls">
-        <button type="button" onClick={() => settingWallNodes()}>
-          Build Walls
-        </button>
+        <Dropdown id="navbar-wall-dropdown">
+          <Dropdown.Toggle id="wall-dropdown">
+            Building
+            <img
+              src={
+                wallNodeType === ModeConstants.BRICK_WALL ? BrickWall : HayWall
+              }
+              alt="The current wall node being built."
+              className="building-wall-type-img"
+            />
+            {wallNodeType === ModeConstants.BRICK_WALL ? 'Brick ' : 'Hay '}
+            Walls
+          </Dropdown.Toggle>
+          <Dropdown.Menu>
+            <Dropdown.Item
+              onClick={() => setWallNodeType(ModeConstants.BRICK_WALL)}
+            >
+              <img
+                src={BrickWall}
+                alt="Click to choose to build a brick wall type."
+                className="building-wall-type-img"
+              />
+              Brick
+            </Dropdown.Item>
+            <Dropdown.Item
+              onClick={() => setWallNodeType(ModeConstants.HAY_WALL)}
+            >
+              <img
+                src={HayWall}
+                alt="Click to choose to build a hay wall type."
+                className="building-wall-type-img"
+              />
+              Hay
+            </Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
         <button
           type="button"
           onClick={() => mode === ModeConstants.EDITING && toggleBridgeNode()}
         >
           {bridgeNodeExists ? 'Remove Bridge' : 'Add Bridge'}
         </button>
-        <Dropdown id="navbarDropdownTest">
+        <Dropdown id="navbar-algorithm-dropdown">
           <Dropdown.Toggle id="algorithm-dropdown">{algorithm}</Dropdown.Toggle>
           <Dropdown.Menu>
             <Dropdown.Item onClick={() => setAlgorithm(ModeConstants.BFS)}>
@@ -129,10 +171,12 @@ const mapStateToProps = (state: RootState): StateProps => ({
   bridgeNodeExists: state.mode.bridgeNodeExists,
   mode: state.mode.mode,
   algorithm: state.mode.solvingAlg,
+  wallNodeType: state.mode.wallNodeType,
 });
 
 const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => ({
-  settingWallNodes: () => dispatch(modeActions.settingWallNodes()),
+  setWallNodeType: (wallNodeType) =>
+    dispatch(modeActions.setWallNodeType(wallNodeType)),
   toggleBridgeNode: () => dispatch(modeActions.toggleBridgeNode()),
   setMode: (mode) => dispatch(modeActions.setMode(mode)),
   setAlgorithm: (alg) => dispatch(modeActions.setSolvingAlg(alg)),

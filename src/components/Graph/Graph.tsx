@@ -14,7 +14,7 @@ import _ from 'underscore';
 import { ENTER, Point, SPACE, nodeStyles } from '../../constants/constants';
 import { RootState } from '../../redux/reducers';
 import graphActions from '../../redux/actions/graph';
-import { ModeConstants, ModeType, NodeType } from '../../redux/constants';
+import { ModeConstants, ModeType, WallNodeType } from '../../redux/constants';
 import Dijkstras from '../../algorithms/Dijkstras';
 import AStar from '../../algorithms/AStar';
 import BFS from '../../algorithms/BFS';
@@ -28,7 +28,7 @@ interface GraphProps {
 
 interface StateProps {
   mode: ModeType;
-  settingNodeType: NodeType;
+  wallNodeType: WallNodeType;
   reset: boolean;
   alg: SolvingAlgorithmType;
   bridgeNodeExists: boolean;
@@ -44,7 +44,7 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
   width,
   height,
   mode,
-  settingNodeType,
+  wallNodeType,
   reset,
   alg,
   bridgeNodeExists,
@@ -333,7 +333,7 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
             // set to inactive if it was already a wall, otherwise set it to a wall
             ref.current.className =
               ref.current.className === nodeStyles.INACTIVE
-                ? nodeStyles.WALL
+                ? wallNodeType
                 : nodeStyles.INACTIVE;
           }
           break;
@@ -364,7 +364,7 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
                 selectedType.current =
                   ref.current && ref.current.className !== nodeStyles.INACTIVE
                     ? ref.current.className
-                    : settingNodeType;
+                    : wallNodeType;
                 handleClick(ref, { x, y });
               }}
               onMouseUp={async () => {
@@ -391,7 +391,7 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
 
 const mapStateToProps = (state: RootState): StateProps => ({
   mode: state.mode.mode,
-  settingNodeType: state.mode.settingNodeType,
+  wallNodeType: state.mode.wallNodeType,
   reset: state.graph.reset,
   alg: state.mode.solvingAlg,
   bridgeNodeExists: state.mode.bridgeNodeExists,

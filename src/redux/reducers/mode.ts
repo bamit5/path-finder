@@ -4,20 +4,20 @@ import { AnyAction } from 'redux';
 import {
   ModeConstants,
   ModeType,
-  NodeType,
   SolvingAlgorithmType,
+  WallNodeType,
 } from '../constants/index';
 
 export interface ModeState {
   mode: ModeType;
-  settingNodeType: NodeType;
+  wallNodeType: WallNodeType;
   solvingAlg: SolvingAlgorithmType;
   bridgeNodeExists: boolean;
 }
 
 const initialState: ModeState = {
   mode: ModeConstants.EDITING,
-  settingNodeType: ModeConstants.SETTING_WALL_NODES,
+  wallNodeType: ModeConstants.BRICK_WALL,
   solvingAlg: ModeConstants.A_STAR,
   bridgeNodeExists: false,
 };
@@ -66,10 +66,10 @@ const mode = (state = initialState, action: AnyAction) => {
         solvingAlg: ModeConstants.A_STAR,
       };
 
-    case ModeConstants.SETTING_WALL_NODES:
+    case ModeConstants.SET_WALL_TYPE:
       return {
         ...state,
-        settingNodeType: ModeConstants.SETTING_WALL_NODES,
+        wallNodeType: action.message,
       };
 
     case ModeConstants.TOGGLE_BRIDGE_NODE:

@@ -19,7 +19,7 @@ export interface NodeData {
   prev: NodeData | null;
   type: string;
   visited: boolean;
-  cost: 0;
+  cost: number;
 }
 
 export interface Point {
@@ -29,7 +29,9 @@ export interface Point {
 
 export const nodeStyles = {
   INACTIVE: 'inactive-node',
-  WALL: 'wall-node',
+  // WALL: 'wall-node', // TODO
+  BRICK_WALL: 'brick-wall-node',
+  HAY_WALL: 'hay-wall-node',
   START: 'start-node',
   END: 'end-node',
   BRIDGE: 'bridge-node',
@@ -64,4 +66,8 @@ export const weights = {
   'start-node': 1,
   'end-node': 1,
   'bridge-node': 1,
+  'brick-wall-node': Number.POSITIVE_INFINITY,
+  'hay-wall-node': 5,
 };
+
+// TODO clean up this file

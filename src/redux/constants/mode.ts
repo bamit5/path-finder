@@ -9,8 +9,9 @@ enum ModeConstants {
   DIJKSTRAS = 'Dijkstras',
   A_STAR = 'A*',
   // edit graph modes
-  SETTING_WALL_NODES = 'wall-node',
-  SETTING_WEIGHTED_NODES = 'weighted-node', // TODO
+  SET_WALL_TYPE = 'SET_WALL_TYPE',
+  BRICK_WALL = 'brick-wall-node',
+  HAY_WALL = 'hay-wall-node',
   TOGGLE_BRIDGE_NODE = 'bridge-node',
 }
 
@@ -20,7 +21,7 @@ type Mode =
   | ModeConstants.VISUALIZING
   | ModeConstants.COMPLETED;
 
-type Node = ModeConstants.SETTING_WALL_NODES | ModeConstants.TOGGLE_BRIDGE_NODE;
+type WallNode = ModeConstants.BRICK_WALL | ModeConstants.HAY_WALL;
 
 type SolvingAlgorithm =
   | ModeConstants.BFS
@@ -29,5 +30,5 @@ type SolvingAlgorithm =
 
 export { ModeConstants };
 export type ModeType = Mode;
-export type NodeType = Node;
+export type WallNodeType = WallNode;
 export type SolvingAlgorithmType = SolvingAlgorithm;

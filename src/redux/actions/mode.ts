@@ -1,5 +1,9 @@
-import { ModeType, SolvingAlgorithmType } from '../constants/mode';
-import { ModeConstants } from '../constants';
+import {
+  ModeConstants,
+  ModeType,
+  SolvingAlgorithmType,
+  WallNodeType,
+} from '../constants';
 
 const setMode = (mode: ModeType) => ({
   type: mode,
@@ -9,8 +13,9 @@ const setSolvingAlg = (alg: SolvingAlgorithmType) => ({
   type: alg,
 });
 
-const settingWallNodes = () => ({
-  type: ModeConstants.SETTING_WALL_NODES,
+const setWallNodeType = (wallNodeType: WallNodeType) => ({
+  type: ModeConstants.SET_WALL_TYPE,
+  message: wallNodeType,
 });
 
 const toggleBridgeNode = () => ({
@@ -20,7 +25,7 @@ const toggleBridgeNode = () => ({
 const modeActions = {
   setMode,
   setSolvingAlg,
-  settingWallNodes,
+  setWallNodeType,
   toggleBridgeNode,
 };
 

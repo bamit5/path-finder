@@ -2,9 +2,12 @@ $node-size: 4vh;
 $node-hover-emphasis: 0.15vh;
 $node-color: lightgrey;
 $color-emphasis: 20%;
+$assets-path: '../../assets';
 $node-regular-types:
   "inactive" white,
-  "wall" black,
+  //"wall" #000000, // TODO
+  "brick-wall" #00000000,
+  "hay-wall" #00000000,
   "start" #83e0c1,
   "end" #f79cee,
   "bridge" burlywood;
@@ -142,4 +145,14 @@ $node-path-types:
       border: 0px;
     }
   }
+}
+
+.brick-wall-node { // TODO
+  background-image: url(#{$assets-path}/BrickWall.png);
+  background-size: contain;
+}
+
+.hay-wall-node { // TODO
+  background-image: url(#{$assets-path}/HayWall.jpg);
+  background-size: contain;
 }
