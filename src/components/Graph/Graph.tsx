@@ -35,6 +35,7 @@ interface StateProps {
   mode: ModeType;
   wallNodeType: WallNodeType;
   reset: boolean;
+  clearPath: boolean;
   alg: SolvingAlgorithmType;
   bridgeNodeExists: boolean;
   speedStr: SpeedType;
@@ -43,6 +44,7 @@ interface StateProps {
 interface DispatchProps {
   setMode: (mode: ModeType) => void;
   doneResetting: () => void;
+  doneClearingPath: () => void;
   setGraphSuccess: (s: boolean) => void;
 }
 
@@ -52,11 +54,13 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
   mode,
   wallNodeType,
   reset,
+  clearPath,
   alg,
   bridgeNodeExists,
   speedStr,
   setMode,
   doneResetting,
+  doneClearingPath,
   setGraphSuccess,
 }) => {
   // Please Note: I'm using useRef instead of useState because it updates faster
@@ -262,10 +266,10 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
         const ref = getNodeRef({ x: node.x, y: node.y });
         if (ref) {
           if (speed === 0) {
-            ref.className = 'visited-first-node';
+            ref.className = nodeStyles.VISITED_FIRST;
           } else {
             setTimeout(() => {
-              ref.className = 'visited-first-node';
+              ref.className = nodeStyles.VISITED_FIRST;
             }, i * speed);
           }
         }
@@ -280,10 +284,10 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
           const ref = getNodeRef({ x: node.x, y: node.y });
           if (ref) {
             if (speed === 0) {
-              ref.className = 'visited-second-node';
+              ref.className = nodeStyles.VISITED_SECOND;
             } else {
               setTimeout(() => {
-                ref.className = 'visited-second-node';
+                ref.className = nodeStyles.VISITED_SECOND;
               }, nVFTotalTimeout + i * speed);
             }
           }
@@ -296,10 +300,10 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
         const ref = getNodeRef({ x: node.x, y: node.y });
         if (ref) {
           if (speed === 0) {
-            ref.className = 'taken-first-node';
+            ref.className = nodeStyles.TAKEN_FIRST;
           } else {
             setTimeout(() => {
-              ref.className = 'taken-first-node';
+              ref.className = nodeStyles.TAKEN_FIRST;
             }, nVFTotalTimeout + nVSTotalTimeout + i * speed);
           }
         }
@@ -314,10 +318,10 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
           const ref = getNodeRef({ x: node.x, y: node.y });
           if (ref) {
             if (speed === 0) {
-              ref.className = 'taken-second-node';
+              ref.className = nodeStyles.TAKEN_SECOND;
             } else {
               setTimeout(() => {
-                ref.className = 'taken-second-node';
+                ref.className = nodeStyles.TAKEN_SECOND;
               }, nVFTotalTimeout + nVSTotalTimeout + nTFTotalTimeout + i * speed);
             }
           }
@@ -338,11 +342,7 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
 
   useEffect(() => {
     // handle resetting
-    if (
-      reset &&
-      mode !== ModeConstants.SOLVING &&
-      mode !== ModeConstants.VISUALIZING
-    ) {
+    if (reset) {
       // reset graph styles
       getNodeRefs().forEach((row) =>
         row.forEach((ref) => {
@@ -358,6 +358,28 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
       doneResetting();
     }
   }, [reset]);
+
+  useEffect(() => {
+    // handle clearing the path
+    if (clearPath) {
+      // reset only searching/path nodes
+      getNodeRefs().forEach((row) =>
+        row.forEach((ref) => {
+          if (
+            ref.current &&
+            (ref.current.className === nodeStyles.VISITED_FIRST ||
+              ref.current.className === nodeStyles.VISITED_SECOND ||
+              ref.current.className === nodeStyles.TAKEN_FIRST ||
+              ref.current.className === nodeStyles.TAKEN_SECOND)
+          ) {
+            ref.current.className = nodeStyles.INACTIVE;
+          }
+        }),
+      );
+
+      doneClearingPath();
+    }
+  }, [clearPath]);
 
   // handle adding/removing bridge node
   useEffect(() => {
@@ -462,6 +484,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
   mode: state.mode.mode,
   wallNodeType: state.mode.wallNodeType,
   reset: state.graph.reset,
+  clearPath: state.graph.clear,
   alg: state.mode.solvingAlg,
   bridgeNodeExists: state.mode.bridgeNodeExists,
   speedStr: state.mode.speed,
@@ -469,7 +492,8 @@ const mapStateToProps = (state: RootState): StateProps => ({
 
 const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => ({
   setMode: (mode) => dispatch(modeActions.setMode(mode)),
-  doneResetting: () => dispatch(graphActions.doneResetting()),
+  doneResetting: () => dispatch(graphActions.setResetBoard(false)),
+  doneClearingPath: () => dispatch(graphActions.setClearPath(false)),
   setGraphSuccess: (s) => dispatch(graphActions.setSuccess(s)),
 });
 

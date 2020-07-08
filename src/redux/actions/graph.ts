@@ -1,11 +1,13 @@
 import { GraphConstants } from '../constants';
 
-const resetGraph = () => ({
-  type: GraphConstants.RESET,
+const setResetBoard = (reset: boolean) => ({
+  type: GraphConstants.SET_RESET_BOARD,
+  message: reset,
 });
 
-const doneResetting = () => ({
-  type: GraphConstants.DONE_RESETTING,
+const setClearPath = (clear: boolean) => ({
+  type: GraphConstants.SET_CLEAR_PATH,
+  message: clear,
 });
 
 const setSuccess = (success: boolean) => ({
@@ -14,8 +16,8 @@ const setSuccess = (success: boolean) => ({
 });
 
 const graphActions = {
-  resetGraph,
-  doneResetting,
+  setResetBoard,
+  setClearPath,
   setSuccess,
 };
 

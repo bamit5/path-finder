@@ -36,8 +36,10 @@ export const nodeStyles = {
   START: 'start-node',
   END: 'end-node',
   BRIDGE: 'bridge-node',
-  VISITED: 'visited-node',
-  TAKEN: 'taken-node',
+  VISITED_FIRST: 'visited-first-node',
+  VISITED_SECOND: 'visited-second-node',
+  TAKEN_FIRST: 'taken-first-node',
+  TAKEN_SECOND: 'taken-second-node',
 };
 // export enum nodeStyles {
 //   INACTIVE = 'inactive-node',

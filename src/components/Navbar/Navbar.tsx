@@ -38,6 +38,7 @@ interface DispatchProps {
   setAlg: (alg: SolvingAlgorithmType) => void;
   setSpeed: (speed: SpeedType) => void;
   resetGraph: () => void;
+  clearPath: () => void;
 }
 
 const CustomNavbar: React.FC<NavbarProps & StateProps & DispatchProps> = ({
@@ -53,6 +54,7 @@ const CustomNavbar: React.FC<NavbarProps & StateProps & DispatchProps> = ({
   setAlg,
   setSpeed,
   resetGraph,
+  clearPath,
 }) => (
   <Navbar collapseOnSelect bg="dark" variant="dark" expand="md">
     <Navbar.Brand>
@@ -70,16 +72,10 @@ const CustomNavbar: React.FC<NavbarProps & StateProps & DispatchProps> = ({
     <Navbar.Collapse className="justify-content-end">
       <Nav className="controls">
         {
-          // only show the brick or hay dropdown if the algorithm can be weighted
-          alg !== ModeConstants.BFS && (
+          // only show the brick or hay dropdown if algorithm is weighted and in editing mode
+          alg !== ModeConstants.BFS && mode === ModeConstants.EDITING && (
             <Dropdown id="navbar-wall-dropdown">
-              <Dropdown.Toggle
-                id="wall-dropdown"
-                disabled={
-                  // disable wall node type switch button when not in editing mode
-                  mode !== ModeConstants.EDITING
-                }
-              >
+              <Dropdown.Toggle id="wall-dropdown">
                 Building
                 <img
                   src={
@@ -121,97 +117,93 @@ const CustomNavbar: React.FC<NavbarProps & StateProps & DispatchProps> = ({
           )
         }
 
-        <button
-          type="button"
-          onClick={() => toggleBridgeNode()}
-          disabled={
-            // disable adding/removing a bridge mode when not in editing mode
-            mode !== ModeConstants.EDITING
-          }
-        >
-          {bridgeNodeExists ? 'Remove Bridge' : 'Add Bridge'}
-        </button>
+        {mode === ModeConstants.EDITING && (
+          <button type="button" onClick={() => toggleBridgeNode()}>
+            {bridgeNodeExists ? 'Remove Bridge' : 'Add Bridge'}
+          </button>
+        )}
 
-        <Dropdown id="navbar-algorithm-dropdown">
-          <Dropdown.Toggle
-            id="algorithm-dropdown"
-            disabled={
-              // disable switching algorithm when not in editing mode
-              mode !== ModeConstants.EDITING
-            }
+        {mode === ModeConstants.EDITING && (
+          <Dropdown id="navbar-algorithm-dropdown">
+            <Dropdown.Toggle id="algorithm-dropdown">
+              Algorithm: {alg}
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              <Dropdown.Item onClick={() => setAlg(ModeConstants.BFS)}>
+                {ModeConstants.BFS}
+              </Dropdown.Item>
+              <Dropdown.Item onClick={() => setAlg(ModeConstants.DIJKSTRAS)}>
+                {ModeConstants.DIJKSTRAS}
+              </Dropdown.Item>
+              <Dropdown.Item onClick={() => setAlg(ModeConstants.A_STAR)}>
+                {ModeConstants.A_STAR}
+              </Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+        )}
+
+        {mode === ModeConstants.EDITING && (
+          <Dropdown id="navbar-speed-dropdown">
+            <Dropdown.Toggle id="speed-dropdown">
+              Speed: {speed}
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              <Dropdown.Item onClick={() => setSpeed(ModeConstants.SLOW)}>
+                {ModeConstants.SLOW}
+              </Dropdown.Item>
+              <Dropdown.Item onClick={() => setSpeed(ModeConstants.FAST)}>
+                {ModeConstants.FAST}
+              </Dropdown.Item>
+              <Dropdown.Item onClick={() => setSpeed(ModeConstants.FLASH)}>
+                {ModeConstants.FLASH}
+              </Dropdown.Item>
+              <Dropdown.Item onClick={() => setSpeed(ModeConstants.IMMEDIATE)}>
+                {ModeConstants.IMMEDIATE}
+              </Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+        )}
+
+        {mode === ModeConstants.EDITING && (
+          <button
+            type="button"
+            onClick={() => {
+              // now in solving state
+              setMode(ModeConstants.SOLVING);
+            }}
           >
-            Algorithm: {alg}
-          </Dropdown.Toggle>
-          <Dropdown.Menu>
-            <Dropdown.Item onClick={() => setAlg(ModeConstants.BFS)}>
-              {ModeConstants.BFS}
-            </Dropdown.Item>
-            <Dropdown.Item onClick={() => setAlg(ModeConstants.DIJKSTRAS)}>
-              {ModeConstants.DIJKSTRAS}
-            </Dropdown.Item>
-            <Dropdown.Item onClick={() => setAlg(ModeConstants.A_STAR)}>
-              {ModeConstants.A_STAR}
-            </Dropdown.Item>
-          </Dropdown.Menu>
-        </Dropdown>
+            Solve
+          </button>
+        )}
 
-        <Dropdown id="navbar-speed-dropdown">
-          <Dropdown.Toggle
-            id="speed-dropdown"
-            disabled={
-              // disable switching speed when not in editing mode
-              mode !== ModeConstants.EDITING
-            }
+        {mode !== ModeConstants.SOLVING && mode !== ModeConstants.VISUALIZING && (
+          <button
+            type="button"
+            onClick={() => {
+              // now reseting
+              resetGraph();
+              setMode(ModeConstants.EDITING);
+
+              // check if need to reset "add/remove bridge" button
+              if (bridgeNodeExists) toggleBridgeNode();
+            }}
           >
-            Speed: {speed}
-          </Dropdown.Toggle>
-          <Dropdown.Menu>
-            <Dropdown.Item onClick={() => setSpeed(ModeConstants.SLOW)}>
-              {ModeConstants.SLOW}
-            </Dropdown.Item>
-            <Dropdown.Item onClick={() => setSpeed(ModeConstants.FAST)}>
-              {ModeConstants.FAST}
-            </Dropdown.Item>
-            <Dropdown.Item onClick={() => setSpeed(ModeConstants.FLASH)}>
-              {ModeConstants.FLASH}
-            </Dropdown.Item>
-            <Dropdown.Item onClick={() => setSpeed(ModeConstants.IMMEDIATE)}>
-              {ModeConstants.IMMEDIATE}
-            </Dropdown.Item>
-          </Dropdown.Menu>
-        </Dropdown>
+            Reset
+          </button>
+        )}
 
-        <button
-          type="button"
-          onClick={() => {
-            // now in solving state
-            setMode(ModeConstants.SOLVING);
-          }}
-          disabled={
-            // disable solve when not in editing mode
-            mode !== ModeConstants.EDITING
-          }
-        >
-          Solve
-        </button>
-
-        <button
-          type="button"
-          onClick={() => {
-            // now reseting
-            resetGraph();
-            setMode(ModeConstants.EDITING);
-
-            // check if need to reset "add/remove bridge" button
-            if (bridgeNodeExists) toggleBridgeNode();
-          }}
-          disabled={
-            // disable reset when solving/visualizing
-            mode === ModeConstants.SOLVING || mode === ModeConstants.VISUALIZING
-          }
-        >
-          Reset
-        </button>
+        {mode === ModeConstants.COMPLETED && (
+          <button
+            type="button"
+            onClick={() => {
+              // clearing the visualized path
+              clearPath();
+              setMode(ModeConstants.EDITING);
+            }}
+          >
+            Clear Path
+          </button>
+        )}
 
         <Nav.Link
           href="https://github.com/bamit5/path-finder"
@@ -240,7 +232,8 @@ const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => ({
   setMode: (mode) => dispatch(modeActions.setMode(mode)),
   setAlg: (alg) => dispatch(modeActions.setSolvingAlg(alg)),
   setSpeed: (speed) => dispatch(modeActions.setSpeed(speed)),
-  resetGraph: () => dispatch(graphActions.resetGraph()),
+  resetGraph: () => dispatch(graphActions.setResetBoard(true)),
+  clearPath: () => dispatch(graphActions.setClearPath(true)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(CustomNavbar);

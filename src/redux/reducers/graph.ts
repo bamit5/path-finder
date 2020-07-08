@@ -4,26 +4,28 @@ import { GraphConstants } from '../constants';
 
 export interface GraphState {
   reset: boolean;
+  clear: boolean;
   success: boolean;
 }
 
 const initialState: GraphState = {
   reset: true,
+  clear: false,
   success: true,
 };
 
 const graph = (state = initialState, action: AnyAction) => {
   switch (action.type) {
-    case GraphConstants.RESET:
+    case GraphConstants.SET_RESET_BOARD:
       return {
         ...state,
-        reset: true,
+        reset: action.message,
       };
 
-    case GraphConstants.DONE_RESETTING:
+    case GraphConstants.SET_CLEAR_PATH:
       return {
         ...state,
-        reset: false,
+        clear: action.message,
       };
 
     case GraphConstants.SET_SUCCESS:
