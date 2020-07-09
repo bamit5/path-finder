@@ -81,7 +81,7 @@ export const weights = {
   'bridge-node': 1,
   'wall-node': Number.POSITIVE_INFINITY,
   'brick-wall-node': Number.POSITIVE_INFINITY,
-  'hay-wall-node': 7,
+  'hay-wall-node': 5,
 };
 
 export const Speed = {
