@@ -19,7 +19,6 @@ export interface NodeData {
   prev: NodeData | null;
   type: string;
   visited: boolean;
-  cost: number;
 }
 
 export interface Point {
@@ -60,7 +59,6 @@ export const defaultNode: NodeData = {
   prev: null,
   type: nodeStyles.INACTIVE,
   visited: false,
-  cost: 0,
 };
 
 // TODO export const createNode = <T extends BasicNodeData>(

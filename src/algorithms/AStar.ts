@@ -21,12 +21,12 @@ const aStar = (graph: NodeGraph, s: Point, e: Point) => {
 
   // create min priority queue of costs
   const pq = new PQ((a: NodeData, b: NodeData) => {
-    if (b.cost - a.cost !== 0) {
-      return b.cost - a.cost;
+    // the cost is the distance + heuristic, min priority is b.cost - a.cost
+    if (b.dist + h(b) - (a.dist + h(a)) !== 0) {
+      return b.dist + h(b) - (a.dist + h(a));
     }
+    // if the cost is the same, return whichever has a better heuristic
     return h(b) - h(a);
-
-    // TODO return b.cost - a.cost;
   });
 
   // set start node distance to 0 and enqueue it
@@ -40,7 +40,7 @@ const aStar = (graph: NodeGraph, s: Point, e: Point) => {
   const nodesTaken: NodeData[] = [];
 
   while (!pq.isEmpty()) {
-    // get node with lest cost in priority queue
+    // get node with least cost in priority queue
     const cur: NodeData = pq.deq();
 
     // if already visited, continue
@@ -70,10 +70,9 @@ const aStar = (graph: NodeGraph, s: Point, e: Point) => {
       // if there is a shorter path to neighbor through cur
       const distToNThruCur = cur.dist + weights[n.type];
       if (distToNThruCur < n.dist) {
-        // set the neighbor's prev node, dist, cost and add it to the pq
+        // set the neighbor's prev node, dist and add it to the pq
         n.prev = cur;
         n.dist = distToNThruCur;
-        n.cost = n.dist + h(n);
         pq.enq(n);
       }
     });
@@ -109,7 +108,7 @@ const solve = (
   // create function that can create a new deep copy of correctly formatted graph
   const graphCopy = (): NodeGraph =>
     types.map((row, x) =>
-      row.map((type, y) => ({ ...defaultNode, type, x, y, cost: 0 })),
+      row.map((type, y) => ({ ...defaultNode, type, x, y })),
     );
 
   // handle the bridge node
