@@ -37,9 +37,6 @@ const Introduction: React.FC<IntroductionProps> = ({ show, setShow }) => (
       </p>
       <p className="instructions-note">
         Here, a movement from one node to a regular node has a cost of 1.
-        <br />
-        If you want more in-depth explanations, check out the links next to the
-        algorithm names in the navbar.
       </p>
 
       <p className="instructions-q">What are walls and bridges?</p>
@@ -48,13 +45,15 @@ const Introduction: React.FC<IntroductionProps> = ({ show, setShow }) => (
         <img src={BrickWall} alt="Brick wall." className="wall-type-img" />{' '}
         brick wall is impassable. A{' '}
         <img src={HayWall} alt="Hay wall." className="wall-type-img" /> hay wall
-        is passable, but requires extra cost.
+        is passable, but requires an extra cost of 5.
         <br />A <span className="bridge">bridge</span> node is a stopping point
-        where the path must cross to reach the end node.
+        midway between the <span className="start">start</span> and
+        <span className="end"> end</span> node where the path must cross.
       </p>
       <p className="instructions-note">
-        Brick is too heavy to move, but hay is pretty light! Sometimes, it's
-        faster to move a hay wall then to walk around it.
+        What's the point of a hay wall? Brick is too heavy to move, but hay is
+        pretty light! Sometimes, it's faster (aka less cost) to move a hay wall
+        then to walk around it.
       </p>
 
       <p className="instructions-q">How do I use Path Finder?</p>
@@ -81,8 +80,8 @@ const Introduction: React.FC<IntroductionProps> = ({ show, setShow }) => (
         2) Pick an algorithm from the navbar dropdown.
       </p>
       <p className="instructions-note">
-        Next to the algorithms are links to sources that explain each algorithm
-        in detail.
+        Feel free to Google the algorithms to find out how they work! These are
+        famous algorithms, with plenty of resources available online.
         <br />
         Some algorithms cannot be used with weighted nodes (aka Hay nodes)!
         These algorithms, such as Breadth First Search, will use plain black
@@ -90,7 +89,14 @@ const Introduction: React.FC<IntroductionProps> = ({ show, setShow }) => (
       </p>
 
       <p className="instructions-a">
-        3) Click solve and watch the magic happen!
+        3) Choose at which speed you would like to visualize the algorithm, and
+        click solve to watch the magic happen!
+      </p>
+      <p className="instructions-note">
+        Here's a tip! Once Path Finder has finished visualizing, you can drag
+        around the start, end, or bridge node and the graph will be updated
+        immediately. Use this to quickly check out how changes affect the
+        shortest path and visited nodes.
       </p>
 
       <p className="instructions-q">
