@@ -10,6 +10,7 @@ import { Dispatch } from 'redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGithub } from '@fortawesome/free-brands-svg-icons';
 import { faQuestionCircle } from '@fortawesome/free-regular-svg-icons';
+
 import { RootState } from '../../redux/reducers';
 import modeActions from '../../redux/actions/mode';
 
@@ -76,7 +77,6 @@ const CustomNavbar: React.FC<NavbarProps & StateProps & DispatchProps> = ({
           alg !== ModeConstants.BFS && mode === ModeConstants.EDITING && (
             <Dropdown id="navbar-wall-dropdown">
               <Dropdown.Toggle id="wall-dropdown">
-                Building
                 <img
                   src={
                     wallNodeType === ModeConstants.BRICK_WALL
@@ -86,8 +86,6 @@ const CustomNavbar: React.FC<NavbarProps & StateProps & DispatchProps> = ({
                   alt="The current wall node being built."
                   className="building-wall-type-img"
                 />
-                {wallNodeType === ModeConstants.BRICK_WALL ? 'Brick ' : 'Hay '}
-                Walls
               </Dropdown.Toggle>
               <Dropdown.Menu>
                 <Dropdown.Item

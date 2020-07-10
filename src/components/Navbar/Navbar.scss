@@ -21,10 +21,21 @@ button {
 
 .question-icon {
   cursor: pointer !important;
+  color: white;
   margin: 0vh 2vh;
 
   &:hover {
-    color: darken($color, $color-emphasis) !important;
+    color: darkgrey !important;
+  }
+}
+
+.dropdown-icon {
+  cursor: pointer !important;
+  color: black;
+  margin: 0vh 2vh;
+
+  &:hover {
+    color: darkgrey !important;
   }
 }
 

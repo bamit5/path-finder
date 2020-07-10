@@ -35,7 +35,7 @@ interface StateProps {
   mode: ModeType;
   wallNodeType: WallNodeType;
   reset: boolean;
-  clearPath: boolean;
+  shouldClearPath: boolean;
   alg: SolvingAlgorithmType;
   bridgeNodeExists: boolean;
   speedStr: SpeedType;
@@ -54,7 +54,7 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
   mode,
   wallNodeType,
   reset,
-  clearPath,
+  shouldClearPath,
   alg,
   bridgeNodeExists,
   speedStr,
@@ -197,81 +197,125 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
     }
   }, [alg]);
 
-  useEffect(() => {
-    // handle solving and visualzing
-    if (mode === ModeConstants.SOLVING) {
-      // find which algorithm to use for solving
-      let solve: Function;
-      switch (alg) {
-        case ModeConstants.BFS:
-          solve = BFS.solve;
-          break;
+  const solve = () => {
+    // find which algorithm to use for solving
+    let solve: Function;
+    switch (alg) {
+      case ModeConstants.BFS:
+        solve = BFS.solve;
+        break;
 
-        case ModeConstants.DIJKSTRAS:
-          solve = Dijkstras.solve;
-          break;
+      case ModeConstants.DIJKSTRAS:
+        solve = Dijkstras.solve;
+        break;
 
-        // A* algorithm is default
-        default:
-          solve = AStar.solve;
-      }
+      // A* algorithm is default
+      default:
+        solve = AStar.solve;
+    }
 
-      // solve with the user chosen algorithm
-      const {
-        nodesVisitedFirst,
-        nodesTakenFirst,
-        nodesVisitedSecond,
-        nodesTakenSecond,
-      } = solve(
-        getNodeRefs().map((row) =>
-          row.map((ref) =>
-            ref.current ? ref.current.className : nodeStyles.INACTIVE,
-          ),
+    // solve with the user chosen algorithm
+    const {
+      nodesVisitedFirst,
+      nodesTakenFirst,
+      nodesVisitedSecond,
+      nodesTakenSecond,
+    } = solve(
+      // TODO have it return only the points, not NodeData
+      getNodeRefs().map((row) =>
+        row.map((ref) =>
+          ref.current ? ref.current.className : nodeStyles.INACTIVE,
         ),
-        startNode.current,
-        endNode.current,
-        bridgeNode.current || undefined,
-      );
+      ),
+      startNode.current,
+      endNode.current,
+      bridgeNode.current || undefined,
+    );
 
-      // set graph success and begin visualizing
-      setGraphSuccess(
-        nodesTakenFirst.length > 0 &&
-          (!nodesTakenSecond || nodesTakenSecond.length > 0),
-      );
-      setMode(ModeConstants.VISUALIZING);
+    return {
+      nodesVisitedFirst,
+      nodesTakenFirst,
+      nodesVisitedSecond,
+      nodesTakenSecond,
+    };
+  };
 
-      // get the speed of visualizing
-      let speed;
-      switch (speedStr) {
-        case ModeConstants.SLOW:
-          speed = 50; // TODO put in constants?
-          break;
+  const visualize = (
+    nodesVisitedFirst: Point[],
+    nodesTakenFirst: Point[],
+    nodesVisitedSecond: Point[],
+    nodesTakenSecond: Point[],
+    speedOverride?: number,
+  ) => {
+    // begin visualizing
+    setMode(ModeConstants.VISUALIZING);
 
-        case ModeConstants.FAST:
-          speed = 30;
-          break;
+    // get the speed of visualizing set in the navbar
+    let speedFromNavbar;
+    switch (speedStr) {
+      case ModeConstants.SLOW:
+        speedFromNavbar = 50; // TODO put in constants?
+        break;
 
-        case ModeConstants.FLASH:
-          speed = 5;
-          break;
+      case ModeConstants.FAST:
+        speedFromNavbar = 30;
+        break;
 
-        // immediate case is handled in maps (you shouldn't have any timeouts for immediate case)
-        default:
-          speed = 0;
+      case ModeConstants.FLASH:
+        speedFromNavbar = 5;
+        break;
+
+      // immediate case is handled in maps (you shouldn't have any timeouts for immediate case)
+      default:
+        speedFromNavbar = 0;
+    }
+
+    // use speedOverride if provided/if 0, otherwise use the speed from the nav bar
+    const speed = speedOverride || (speedOverride === 0 ? 0 : speedFromNavbar);
+
+    // should the animation be immediate or use setTimeout?
+    if (speed === 0) {
+      // visualize visited nodes
+      nodesVisitedFirst.forEach((node) => {
+        const ref = getNodeRef({ x: node.x, y: node.y });
+        if (ref) ref.className = nodeStyles.VISITED_FIRST_IMMEDIATE;
+      });
+
+      // if there was a bridge node, visualize visited from bridge node to end node
+      if (nodesVisitedSecond) {
+        nodesVisitedSecond.forEach((node) => {
+          const ref = getNodeRef({ x: node.x, y: node.y });
+          if (ref) ref.className = nodeStyles.VISITED_SECOND_IMMEDIATE;
+        });
       }
 
+      // visualize taken nodes after visited nodes
+      nodesTakenFirst.forEach((node) => {
+        const ref = getNodeRef({ x: node.x, y: node.y });
+        if (ref) {
+          ref.className = nodeStyles.TAKEN_FIRST_IMMEDIATE;
+        }
+      });
+
+      // if there was a bridge node, visualize taken from bridge node to end node
+      if (nodesTakenSecond) {
+        nodesTakenSecond.forEach((node) => {
+          const ref = getNodeRef({ x: node.x, y: node.y });
+          if (ref) ref.className = nodeStyles.TAKEN_SECOND_IMMEDIATE;
+        });
+      }
+
+      // graph is completed when done visualizing all visited and taken nodes
+      setMode(ModeConstants.COMPLETED);
+    } else {
       // visualize visited nodes
       const nVFTotalTimeout = nodesVisitedFirst.length * speed;
       nodesVisitedFirst.forEach((node, i) => {
         const ref = getNodeRef({ x: node.x, y: node.y });
         if (ref) {
-          if (speed === 0) {
+          setTimeout(() => {
             ref.className = nodeStyles.VISITED_FIRST;
-          } else {
-            setTimeout(() => {
-              ref.className = nodeStyles.VISITED_FIRST;
-            }, i * speed);
-          }
+          }, i * speed);
         }
       });
 
@@ -283,13 +327,9 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
         nodesVisitedSecond.forEach((node, i) => {
           const ref = getNodeRef({ x: node.x, y: node.y });
           if (ref) {
-            if (speed === 0) {
+            setTimeout(() => {
               ref.className = nodeStyles.VISITED_SECOND;
-            } else {
-              setTimeout(() => {
-                ref.className = nodeStyles.VISITED_SECOND;
-              }, nVFTotalTimeout + i * speed);
-            }
+            }, nVFTotalTimeout + i * speed);
           }
         });
       }
@@ -299,13 +339,9 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
       nodesTakenFirst.forEach((node, i) => {
         const ref = getNodeRef({ x: node.x, y: node.y });
         if (ref) {
-          if (speed === 0) {
+          setTimeout(() => {
             ref.className = nodeStyles.TAKEN_FIRST;
-          } else {
-            setTimeout(() => {
-              ref.className = nodeStyles.TAKEN_FIRST;
-            }, nVFTotalTimeout + nVSTotalTimeout + i * speed);
-          }
+          }, nVFTotalTimeout + nVSTotalTimeout + i * speed);
         }
       });
 
@@ -317,26 +353,50 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
         nodesTakenSecond.forEach((node, i) => {
           const ref = getNodeRef({ x: node.x, y: node.y });
           if (ref) {
-            if (speed === 0) {
+            setTimeout(() => {
               ref.className = nodeStyles.TAKEN_SECOND;
-            } else {
-              setTimeout(() => {
-                ref.className = nodeStyles.TAKEN_SECOND;
-              }, nVFTotalTimeout + nVSTotalTimeout + nTFTotalTimeout + i * speed);
-            }
+            }, nVFTotalTimeout + nVSTotalTimeout + nTFTotalTimeout + i * speed);
           }
         });
       }
 
       // graph is completed when done visualizing all visited and taken nodes
-      if (speed === 0) {
-        setMode(ModeConstants.COMPLETED);
-      } else {
-        setTimeout(
-          () => setMode(ModeConstants.COMPLETED),
-          nVFTotalTimeout + nVSTotalTimeout + nTFTotalTimeout + nTSTotalTimeout,
-        );
-      }
+      setTimeout(
+        () => setMode(ModeConstants.COMPLETED),
+        nVFTotalTimeout + nVSTotalTimeout + nTFTotalTimeout + nTSTotalTimeout,
+      );
+    }
+  };
+
+  const solveAndVisualize = (speedOverride?: number) => {
+    // solve the current graph with current chosen algorithm
+    const {
+      nodesVisitedFirst,
+      nodesTakenFirst,
+      nodesVisitedSecond,
+      nodesTakenSecond,
+    } = solve();
+
+    // set graph success
+    setGraphSuccess(
+      nodesTakenFirst.length > 0 &&
+        (!nodesTakenSecond || nodesTakenSecond.length > 0),
+    );
+
+    // visualize solved graph
+    visualize(
+      nodesVisitedFirst,
+      nodesTakenFirst,
+      nodesVisitedSecond,
+      nodesTakenSecond,
+      speedOverride,
+    );
+  };
+
+  useEffect(() => {
+    // handle solving and visualzing
+    if (mode === ModeConstants.SOLVING) {
+      solveAndVisualize();
     }
   }, [mode]);
 
@@ -359,27 +419,36 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
     }
   }, [reset]);
 
+  const clearPath = () => {
+    // reset only searching/path nodes
+    getNodeRefs().forEach((row) =>
+      row.forEach((ref) => {
+        if (
+          ref.current &&
+          (ref.current.className === nodeStyles.VISITED_FIRST ||
+            ref.current.className === nodeStyles.VISITED_SECOND ||
+            ref.current.className === nodeStyles.TAKEN_FIRST ||
+            ref.current.className === nodeStyles.TAKEN_SECOND ||
+            ref.current.className === nodeStyles.VISITED_FIRST_IMMEDIATE ||
+            ref.current.className === nodeStyles.VISITED_SECOND_IMMEDIATE ||
+            ref.current.className === nodeStyles.TAKEN_FIRST_IMMEDIATE ||
+            ref.current.className === nodeStyles.TAKEN_SECOND_IMMEDIATE)
+        ) {
+          ref.current.className = nodeStyles.INACTIVE;
+        }
+      }),
+    );
+  };
+
   useEffect(() => {
     // handle clearing the path
-    if (clearPath) {
-      // reset only searching/path nodes
-      getNodeRefs().forEach((row) =>
-        row.forEach((ref) => {
-          if (
-            ref.current &&
-            (ref.current.className === nodeStyles.VISITED_FIRST ||
-              ref.current.className === nodeStyles.VISITED_SECOND ||
-              ref.current.className === nodeStyles.TAKEN_FIRST ||
-              ref.current.className === nodeStyles.TAKEN_SECOND)
-          ) {
-            ref.current.className = nodeStyles.INACTIVE;
-          }
-        }),
-      );
+    if (shouldClearPath) {
+      clearPath();
 
+      // reset shouldClearPath
       doneClearingPath();
     }
-  }, [clearPath]);
+  }, [shouldClearPath]);
 
   // handle adding/removing bridge node
   useEffect(() => {
@@ -396,8 +465,11 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
     );
 
   const handleClick = (ref: RefObject<HTMLDivElement>, point: Point) => {
-    // only update style if the mode allows for user changes and the clicked node has a ref
-    if (mode === ModeConstants.EDITING && ref.current) {
+    // clicked node's ref must have a current
+    if (!ref.current) return;
+
+    // only update style if the mode allows for user changes
+    if (mode === ModeConstants.EDITING) {
       switch (selectedType.current) {
         case nodeStyles.START:
           // if clicked node can change, set it to start node
@@ -429,6 +501,28 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
           }
           break;
       }
+    } else if (mode === ModeConstants.COMPLETED) {
+      // clicked node must be able to change
+      if (!isChangeableNode(point)) return;
+
+      // has the graph changed? if no, return
+      const change =
+        selectedType.current === nodeStyles.START ||
+        selectedType.current === nodeStyles.END;
+      if (!change) return;
+
+      // clear previous path
+      clearPath();
+
+      // update start or end node
+      if (selectedType.current === nodeStyles.START) {
+        setStartNode(point);
+      } else if (selectedType.current === nodeStyles.END) {
+        setEndNode(point);
+      }
+
+      // if a change was made to the graph, resolve and visualize immediately
+      solveAndVisualize(0);
     }
   };
 
@@ -484,7 +578,7 @@ const mapStateToProps = (state: RootState): StateProps => ({
   mode: state.mode.mode,
   wallNodeType: state.mode.wallNodeType,
   reset: state.graph.reset,
-  clearPath: state.graph.clear,
+  shouldClearPath: state.graph.clear,
   alg: state.mode.solvingAlg,
   bridgeNodeExists: state.mode.bridgeNodeExists,
   speedStr: state.mode.speed,

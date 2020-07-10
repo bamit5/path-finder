@@ -39,6 +39,10 @@ export const nodeStyles = {
   VISITED_SECOND: 'visited-second-node',
   TAKEN_FIRST: 'taken-first-node',
   TAKEN_SECOND: 'taken-second-node',
+  VISITED_FIRST_IMMEDIATE: 'visited-first-node-immediate',
+  VISITED_SECOND_IMMEDIATE: 'visited-second-node-immediate',
+  TAKEN_FIRST_IMMEDIATE: 'taken-first-node-immediate',
+  TAKEN_SECOND_IMMEDIATE: 'taken-second-node-immediate',
 };
 // export enum nodeStyles {
 //   INACTIVE = 'inactive-node',

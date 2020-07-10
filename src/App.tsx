@@ -8,7 +8,7 @@ import Navbar from './components/Navbar/Navbar';
 import { pxToVh } from './constants/constants';
 import Introduction from './components/Introduction/Introduction';
 
-const nodeSize = 3; // TODO should go in constants. can you somehow connect this with the css file?
+const nodeSize = 4; // TODO should go in constants. can you somehow connect this with the css file?
 const navBarHeight = 56; // TODO should go in constants. can you somehow connect this with the css file?
 
 const App = () => {
