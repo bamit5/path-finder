@@ -37,8 +37,8 @@ const aStar = (graph: NodeGraph, s: Point, e: Point) => {
   while (!pq.isEmpty()) {
     // get node with lest cost in priority queue
     const cur: NodeData = pq.deq();
+    console.log('cur');
     console.log(cur);
-    console.log(cur.cost);
 
     // if already visited, continue
     if (cur.visited) continue;
@@ -72,7 +72,6 @@ const aStar = (graph: NodeGraph, s: Point, e: Point) => {
           (cur.prev.y === cur.y && cur.y !== n.y))
           ? 1
           : 0;
-      // TODO console.log(dirCost);
       // if there is a shorter path to neighbor through cur
       const distToNThruCur = cur.dist + weights[n.type] + dirCost;
       if (distToNThruCur < n.dist) {
@@ -80,6 +79,12 @@ const aStar = (graph: NodeGraph, s: Point, e: Point) => {
         n.prev = cur;
         n.dist = distToNThruCur;
         n.cost = n.dist + h(n);
+        console.log('neighbor, dirCost, distance, heuristic, cost:');
+        console.log(n);
+        console.log(dirCost);
+        console.log(n.dist);
+        console.log(h(n));
+        console.log(n.cost);
         pq.enq(n);
       }
     });
