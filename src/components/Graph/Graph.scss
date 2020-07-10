@@ -81,13 +81,9 @@ $node-path-types:
     }
   }
 }
-// TODO add radius. try starting the pop with it being circular, then going to square
-@mixin search-pop($type, $color) {
-  @if $type == "taken-first" or $type == "taken-second" {
-    animation: search-bubble-out 2s infinite ease 0s forwards;
-  } @else {
-    animation: search-pop-#{$type} 2s ease 0s forwards;
-  }
+
+@mixin search-pop-visited ($type, $color) {
+  animation: search-pop-#{$type} 2s ease 0s forwards;
 
   @keyframes search-pop-#{$type} {
     0% {
@@ -96,13 +92,13 @@ $node-path-types:
       border-radius: 25px;
       border: 0px;
     }
-
+  
     40% {
       padding: 0%;
       background-color: darken($color: $color, $amount: $color-emphasis);
       border: 0px;
     }
-
+  
     60% {
       padding: 0%;
       background-color: darken($color: $color, $amount: $color-emphasis);
@@ -110,16 +106,23 @@ $node-path-types:
       border: 0px;
     }
   }
-  @keyframes search-bubble-out {
+}
+
+@mixin search-pop-taken ($type, $color) {
+  animation: search-pop-#{$type} 2s infinite ease 0s forwards;
+
+  @keyframes search-pop-#{$type} {
     40% {
       background-color: darken($color: $color, $amount: $color-emphasis);
     }
-
+  
     60% {
       background-color: darken($color: $color, $amount: $color-emphasis);
     }
   }
+  
 }
+
 
 @each $type, $color in $node-regular-types {
   .#{$type}-node {
@@ -141,9 +144,11 @@ $node-path-types:
   .#{$type}-node {
     @extend .node-basics;
     background-color: $color;
-    @include search-pop($type, $color);
     @if $type == "taken-first" or $type == "taken-second" {
       border: 0px;
+      @include search-pop-taken($type, $color)
+    } @else {
+      @include search-pop-visited($type, $color);
     }
   }
 
@@ -153,6 +158,7 @@ $node-path-types:
     background-color: $color;
     @if $type == "taken-first" or $type == "taken-second" {
       border: 0px;
+      background-color: darken($color, $color-emphasis);
     }
   }
 }

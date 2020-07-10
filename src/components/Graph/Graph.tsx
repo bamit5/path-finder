@@ -505,23 +505,33 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
       // clicked node must be able to change
       if (!isChangeableNode(point)) return;
 
-      // has the graph changed? if no, return
+      // has the graph changed? if not, return
       const change =
         selectedType.current === nodeStyles.START ||
-        selectedType.current === nodeStyles.END;
+        selectedType.current === nodeStyles.END ||
+        selectedType.current === nodeStyles.BRIDGE;
       if (!change) return;
 
       // clear previous path
       clearPath();
 
-      // update start or end node
-      if (selectedType.current === nodeStyles.START) {
-        setStartNode(point);
-      } else if (selectedType.current === nodeStyles.END) {
-        setEndNode(point);
+      // update selected node (only if it's start/end/bridge)
+      // eslint-disable-next-line default-case
+      switch (selectedType.current) {
+        case nodeStyles.START:
+          setStartNode(point);
+          break;
+
+        case nodeStyles.END:
+          setEndNode(point);
+          break;
+
+        case nodeStyles.BRIDGE:
+          setBridgeNode(point);
+          break;
       }
 
-      // if a change was made to the graph, resolve and visualize immediately
+      // if a change was made to the graph, re-solve and re-visualize immediately
       solveAndVisualize(0);
     }
   };
