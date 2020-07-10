@@ -88,6 +88,11 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
   const startNode = useRef<Point>(defaultStartNode());
   const endNode = useRef<Point>(defaultEndNode());
   const bridgeNode = useRef<Point | null>(null);
+  const prevTypes = useRef<{ start: string; end: string; bridge: string }>({
+    start: nodeStyles.INACTIVE,
+    end: nodeStyles.INACTIVE,
+    bridge: nodeStyles.INACTIVE,
+  });
 
   // nodeRefs used for animations (not using useState because setState is async and not awaitable)
   const nodeRefs = useRef<RefObject<HTMLDivElement>[][]>(
@@ -106,6 +111,11 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
     nodeRefs.current = newNodeRefs;
   };
   const getNodeRef = (p: Point) => getNodeRefs()[p.x][p.y].current;
+  const setNodeType = (p: Point, type: string) => {
+    // TODO type should be one of nodeStyles
+    const ref = getNodeRef(p);
+    if (ref) ref.className = type;
+  };
 
   // functions to get current start/end/bridge node
   const getStartRef = () => getNodeRef(startNode.current);
@@ -116,35 +126,46 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
   // functions to set new start/end/bridge nodes (also updates the pre/new ref's)
   const setStartNode = (p: Point) => {
     // reset previous start node
-    let startRef = getStartRef();
-    if (startRef) startRef.className = nodeStyles.INACTIVE;
+    setNodeType(startNode.current, prevTypes.current.start);
+
+    // update the start's prev to what it's replacing
+    const prevRef = getNodeRef(p);
+    if (prevRef) prevTypes.current.start = prevRef.className;
 
     // make new start node
     startNode.current = p;
-    startRef = getStartRef();
-    if (startRef) startRef.className = nodeStyles.START;
+    setNodeType(p, nodeStyles.START);
   };
 
   const setEndNode = (p: Point) => {
     // reset previous end node
-    let endRef = getEndRef();
-    if (endRef) endRef.className = nodeStyles.INACTIVE;
+    setNodeType(endNode.current, prevTypes.current.end);
+
+    // update the end's prev to what it's replacing
+    const prevRef = getNodeRef(p);
+    if (prevRef) prevTypes.current.end = prevRef.className;
 
     // make new end node
     endNode.current = p;
-    endRef = getEndRef();
-    if (endRef) endRef.className = nodeStyles.END;
+    setNodeType(p, nodeStyles.END);
   };
 
   const setBridgeNode = (p: Point | null) => {
     // reset previous bridge node
-    let bridgeRef = getBridgeRef();
-    if (bridgeRef) bridgeRef.className = nodeStyles.INACTIVE;
+    if (bridgeNode.current)
+      setNodeType(bridgeNode.current, prevTypes.current.bridge);
 
-    // make new bridge node
-    bridgeNode.current = p;
-    bridgeRef = getBridgeRef();
-    if (bridgeRef) bridgeRef.className = nodeStyles.BRIDGE;
+    // update the bridge's prev to what it's replacing
+    if (p) {
+      const prevRef = getNodeRef(p);
+      if (prevRef) prevTypes.current.bridge = prevRef.className;
+
+      // make new bridge node
+      bridgeNode.current = p;
+      setNodeType(p, nodeStyles.BRIDGE);
+    } else {
+      bridgeNode.current = null;
+    }
   };
 
   useEffect(() => {
