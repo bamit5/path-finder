@@ -117,12 +117,6 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
     if (ref) ref.className = type;
   };
 
-  // functions to get current start/end/bridge node
-  const getStartRef = () => getNodeRef(startNode.current);
-  const getEndRef = () => getNodeRef(endNode.current);
-  const getBridgeRef = () =>
-    bridgeNode.current ? getNodeRef(bridgeNode.current) : null;
-
   // functions to set new start/end/bridge nodes (also updates the pre/new ref's)
   const setStartNode = (p: Point) => {
     // reset previous start node
@@ -191,6 +185,7 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
     setStartNode(defaultStartNode());
     setEndNode(defaultEndNode());
     setBridgeNode(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [width, height]);
 
   useEffect(() => {
@@ -216,6 +211,7 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
         });
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [alg]);
 
   const solve = () => {
@@ -419,6 +415,7 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
     if (mode === ModeConstants.SOLVING) {
       solveAndVisualize();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode]);
 
   useEffect(() => {
@@ -438,6 +435,7 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
 
       doneResetting();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reset]);
 
   const clearPath = () => {
@@ -469,12 +467,14 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
       // reset shouldClearPath
       doneClearingPath();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shouldClearPath]);
 
   // handle adding/removing bridge node
   useEffect(() => {
     // if bridge node should exist, set bridge node to default state, otherwise null
     setBridgeNode(bridgeNodeExists ? defaultBridgeNode() : null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bridgeNodeExists]);
 
   // TODO
