@@ -1,3 +1,5 @@
+[![Netlify Status](https://api.netlify.com/api/v1/badges/c057d02b-4bff-4ca0-a22a-1be1f18bc80e/deploy-status)](https://app.netlify.com/sites/pathfindervisualizer/deploys)
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
