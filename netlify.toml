@@ -1,4 +1,4 @@
 [build]
-base = "pathfinder/"
-publish = "pathfinder/build/"
+base = "path-finder/"
+publish = "path-finder/build/"
 command = "yarn build"
