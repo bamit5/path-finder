@@ -164,19 +164,18 @@ const Graph: React.FC<GraphProps & StateProps & DispatchProps> = ({
 
   useEffect(() => {
     // resize graph whenever width or height changes, keeping possible previous values
+    /* x < getNodeRefs().length &&
+                  y < getNodeRefs()[x].length &&
+                  getNodeRefs()[x][y]) || */
     setNodeRefs(
       Array(width)
         .fill(null)
         .map((_, x) =>
           Array(height)
             .fill(null)
-            .map(
-              (__, y) =>
-                // use previous value if it exists, otherwise create a new one
-                (x < getNodeRefs().length &&
-                  y < getNodeRefs()[x].length &&
-                  getNodeRefs()[x][y]) ||
-                createRef<HTMLDivElement>(),
+            .map((__, y) =>
+              // use previous value if it exists, otherwise create a new one
+              createRef<HTMLDivElement>(),
             ),
         ),
     );
