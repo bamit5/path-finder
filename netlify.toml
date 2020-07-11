@@ -1,0 +1,4 @@
+[build]
+base = "pathfinder/"
+publish = "pathfinder/build/"
+command = "yarn build"
